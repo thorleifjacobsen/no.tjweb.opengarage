@@ -1,0 +1,11 @@
+{
+  "type": "number",
+  "title": {
+    "en": "RSSI"
+  },
+  "uiComponent": "sensor",
+  "getable": true,
+  "setable": false,
+  "units": "dBm",
+  "icon": "/assets/icon_wifi.svg"
+}

@@ -1,0 +1,33 @@
+{
+  "type": "enum",
+  "title": {
+    "en": "Vehicle State"
+  },
+  "uiComponent": "sensor",
+  "values": [
+    {
+      "id": "0",
+      "title": { 
+        "en": "Absent",
+        "no": "Borte"
+      }
+    },
+    {
+      "id": "1",
+      "title": { 
+        "en": "Present",
+        "no": "Til stede"
+      }
+    },
+    {
+      "id": "2",
+      "title": { 
+        "en": "Unknown",
+        "no": "Ukjent"
+      }
+    }
+  ],
+  "getable": true,
+  "setable": false,
+  "icon": "/assets/icon_presence.svg"
+}

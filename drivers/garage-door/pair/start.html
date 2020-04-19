@@ -1,0 +1,90 @@
+<h1>OpenGarage</h1>
+<p>Enter details to add a new OpenGarage device</p>
+
+<fieldset>
+  <legend>OpenGarage details</legend>
+
+  <div>
+    <p id="error" style='color: red;display:none;'>Error comes here</p>
+
+    <div class="field row">
+      <label class="form-label" for="ip">IP Address</label>
+      <input class="form-input" id="ip" placeholder="Enter IP Address of device " type="text" value="10.0.0.20" />
+    </div>
+
+    <div class="field row">
+      <label class="form-label" for="port">Port</label>
+      <input class="form-input" id="port" placeholder="Port number, default 80" type="text" value="80" />
+    </div>
+
+    <div class="field row">
+      <label class="form-label" for="deviceKey">Device Key</label>
+      <input class="form-input" id="deviceKey" type="password" value="Jze8qRB8MSwyhDaM" />
+    </div>
+    <br />
+    <button id="add">Add</button><br>
+  </div>
+
+</fieldset>
+
+<script type="text/javascript">
+
+  function elem(elem) { return document.getElementById(elem) }
+
+  function setMessage(msg) {
+    elem("error").style.display = !msg ? 'none' : '';
+    elem("error").innerHTML = msg;
+  }
+
+  function setDisabled(value) {
+    ["ip","port","deviceKey","add"].forEach((item, index) => {
+      elem(item).disabled = value;
+    });
+  }
+
+  function getDetails() {
+    return {
+      "ip"        : elem("ip").value,
+      "port"      : elem("port").value,
+      "deviceKey" : elem("deviceKey").value
+    }
+  }
+
+  elem('add').addEventListener('click', () => {
+
+    setDisabled(true);
+    const details = getDetails();
+    if(details.ip == "") { setMessage("IP Address cannot be empty"); }
+    if(details.port == "") { setMessage("Port cannot be empty"); }
+    setMessage(false);
+
+    Homey.emit( 'add', getDetails(), ( err, result ) => {
+      if(result.success == false) {
+        setDisabled(false);
+        setMessage("Could not add, be sure that the IP Address and port is correct. ("+result.data+")");
+      } else {
+        Homey.createDevice({
+          name: result.data.name,
+          data: { id: result.data.mac },
+          settings: { 
+            ip: getDetails().ip,
+            port: parseInt(getDetails().port),
+            deviceKey: getDetails().deviceKey,
+            pollingRate: 30
+          },
+          store: {}
+        }, (err, result) => {
+          if( err ) { 
+            setMessage(err); 
+            setDisabled(false);
+          } else {
+            Homey.done();
+          }
+        })
+      }
+    });
+  });
+
+  
+
+  </script>

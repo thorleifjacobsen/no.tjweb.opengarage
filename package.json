@@ -1,0 +1,11 @@
+{
+  "name": "no.tjweb.opengarage",
+  "version": "1.0.0",
+  "main": "app.js",
+  "devDependencies": {
+    "homey": "^2.3.1"
+  },
+  "dependencies": {
+    "http.min": "^2.0.1"
+  }
+}

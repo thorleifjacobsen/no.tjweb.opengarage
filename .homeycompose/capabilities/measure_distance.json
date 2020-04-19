@@ -1,0 +1,11 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Measured distance"
+  },
+  "uiComponent": "sensor",
+  "getable": true,
+  "setable": false,
+  "units": "cm",
+  "icon": "/assets/icon_distance.svg"
+}

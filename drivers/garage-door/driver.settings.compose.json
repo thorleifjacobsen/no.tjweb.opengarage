@@ -1,0 +1,47 @@
+[{
+  "type": "group",
+  "label": { "en": "General settings" },
+  "children": [
+    {
+      "id": "ip",
+      "type": "text",
+      "label": { "en": "IP Address" },
+      "value": "10.0.0.20"
+    },
+    {
+      "id": "port",
+      "type": "number",
+      "label": { "en": "Port" },
+      "value": 80,
+      "min": 1,
+      "max": 65543,
+      "hint": { "en": "Port used, default is 80." }
+    },
+    {
+      "id": "deviceKey",
+      "type": "text",
+      "label": { "en": "Device Key" },
+      "value": ""
+    },
+    {
+      "id": "openCloseTime",
+      "type": "number",
+      "label": { "en": "Time for door to open or close:" },
+      "hint": { "en": "Number of seconds from you click the button until the garage if fully opened or closed (use longest time function as value). This will trigger a update at this time and deny any button press while opening or closing. Use -1 to disable" },
+      "value": 30,
+      "min": -1,
+      "max": 600,
+      "units": { "en": "seconds" }
+    },
+    {
+      "id": "pollingRate",
+      "type": "number",
+      "label": { "en": "Polling Rate" },
+      "value": 30,
+      "min": 30,
+      "max": 86400,
+      "hint": { "en": "Number of seconds between each time Homey should fetch data from the OpenGarage device." },
+      "units": { "en": "seconds" }
+    }
+  ]
+}]

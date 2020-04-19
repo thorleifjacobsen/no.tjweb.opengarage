@@ -1,0 +1,28 @@
+{
+  "type": "enum",
+  "title": {
+    "en": "Door state"
+  },
+  "values": [
+    {
+      "id": "up",
+      "title": {
+        "en": "Up"
+      }
+    },
+    {
+      "id": "down",
+      "title": {
+        "en": "Down"
+      }
+    }
+  ],
+  "getable": true,
+  "setable": true,
+  "uiComponent": "ternary",
+  "uiQuickAction": false,
+  "insights": true,
+  "insightsTitleTrue": { "en": "Open" },
+  "insightsTitleFalse": {"en": "Closed" }
+
+}

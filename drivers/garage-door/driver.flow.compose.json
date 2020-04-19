@@ -1,0 +1,52 @@
+{
+  "triggers": [
+    {
+      "id": "door_close",
+      "title": { "en": "When door state changes to closed" }
+    },
+    {
+      "id": "door_open",
+      "title": { "en": "When door state changes to open" }
+    },
+    {
+      "id": "vehicle_state_change",
+      "title": { "en": "Vehicle state changed" }
+    }
+  ],
+  "conditions": [
+    {
+      "id": "is_open",
+      "title": {
+        "en": "Door is !{{open|closed}}"
+      }
+    },
+    {
+      "id": "vehicle_is_present",
+      "title": {
+        "en": "Vehicle is !{{present|absent}}"
+      }
+    },
+    {
+      "id": "height_is",
+      "title": {
+        "en": "Distance sensor is !{{higher|lower}} than (centimeters)"
+      },
+      "args": [
+        {
+          "name": "height",
+          "type": "number"
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "id": "door_open",
+      "title": { "en": "Send 'Open' trigger to OpenGarage device. This only clicks the relay if the door is in closed state" }
+    },
+    {
+      "id": "door_close",
+      "title": { "en": "Send 'Close' trigger to OpenGarage device. This only clicks the relay if the door is in open state" }
+    }
+  ]
+}

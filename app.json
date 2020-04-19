@@ -1,0 +1,332 @@
+{
+  "id": "no.tjweb.opengarage",
+  "version": "1.0.0",
+  "compatibility": ">=1.5.0",
+  "sdk": 2,
+  "name": {
+    "en": "OpenGarage"
+  },
+  "description": {
+    "en": "Adds support for OpenGarage"
+  },
+  "category": [
+    "security"
+  ],
+  "permissions": [
+    "homey:manager:api"
+  ],
+  "images": {
+    "large": "/assets/images/large.png",
+    "small": "/assets/images/small.png"
+  },
+  "author": {
+    "name": "Thorleif Jacobsen",
+    "email": "thorleif@tjweb.no"
+  },
+  "flow": {
+    "triggers": [
+      {
+        "id": "door_close",
+        "title": {
+          "en": "When door state changes to closed"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=garage-door"
+          }
+        ]
+      },
+      {
+        "id": "door_open",
+        "title": {
+          "en": "When door state changes to open"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=garage-door"
+          }
+        ]
+      },
+      {
+        "id": "vehicle_state_change",
+        "title": {
+          "en": "Vehicle state changed"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=garage-door"
+          }
+        ]
+      }
+    ],
+    "conditions": [
+      {
+        "id": "is_open",
+        "title": {
+          "en": "Door is !{{open|closed}}"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=garage-door"
+          }
+        ]
+      },
+      {
+        "id": "vehicle_is_present",
+        "title": {
+          "en": "Vehicle is !{{present|absent}}"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=garage-door"
+          }
+        ]
+      },
+      {
+        "id": "height_is",
+        "title": {
+          "en": "Distance sensor is !{{higher|lower}} than (centimeters)"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=garage-door"
+          },
+          {
+            "name": "height",
+            "type": "number"
+          }
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "id": "door_open",
+        "title": {
+          "en": "Send 'Open' trigger to OpenGarage device. This only clicks the relay if the door is in closed state"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=garage-door"
+          }
+        ]
+      },
+      {
+        "id": "door_close",
+        "title": {
+          "en": "Send 'Close' trigger to OpenGarage device. This only clicks the relay if the door is in open state"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=garage-door"
+          }
+        ]
+      }
+    ]
+  },
+  "drivers": [
+    {
+      "id": "garage-door",
+      "name": {
+        "en": "Garage Door"
+      },
+      "class": "other",
+      "capabilities": [
+        "door_state",
+        "vehicle_state",
+        "measure_distance",
+        "measure_rssi"
+      ],
+      "pair": [
+        {
+          "id": "start"
+        },
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_my_devices"
+          }
+        },
+        {
+          "id": "add_my_devices",
+          "template": "add_devices"
+        }
+      ],
+      "settings": [
+        {
+          "type": "group",
+          "label": {
+            "en": "General settings"
+          },
+          "children": [
+            {
+              "id": "ip",
+              "type": "text",
+              "label": {
+                "en": "IP Address"
+              },
+              "value": "10.0.0.20"
+            },
+            {
+              "id": "port",
+              "type": "number",
+              "label": {
+                "en": "Port"
+              },
+              "value": 80,
+              "min": 1,
+              "max": 65543,
+              "hint": {
+                "en": "Port used, default is 80."
+              }
+            },
+            {
+              "id": "deviceKey",
+              "type": "text",
+              "label": {
+                "en": "Device Key"
+              },
+              "value": ""
+            },
+            {
+              "id": "openCloseTime",
+              "type": "number",
+              "label": {
+                "en": "Time for door to open or close:"
+              },
+              "hint": {
+                "en": "Number of seconds from you click the button until the garage if fully opened or closed (use longest time function as value). This will trigger a update at this time and deny any button press while opening or closing. Use -1 to disable"
+              },
+              "value": 30,
+              "min": -1,
+              "max": 600,
+              "units": {
+                "en": "seconds"
+              }
+            },
+            {
+              "id": "pollingRate",
+              "type": "number",
+              "label": {
+                "en": "Polling Rate"
+              },
+              "value": 30,
+              "min": 30,
+              "max": 86400,
+              "hint": {
+                "en": "Number of seconds between each time Homey should fetch data from the OpenGarage device."
+              },
+              "units": {
+                "en": "seconds"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "capabilities": {
+    "door_state": {
+      "type": "enum",
+      "title": {
+        "en": "Door state"
+      },
+      "values": [
+        {
+          "id": "up",
+          "title": {
+            "en": "Up"
+          }
+        },
+        {
+          "id": "down",
+          "title": {
+            "en": "Down"
+          }
+        }
+      ],
+      "getable": true,
+      "setable": true,
+      "uiComponent": "ternary",
+      "uiQuickAction": false,
+      "insights": true,
+      "insightsTitleTrue": {
+        "en": "Open"
+      },
+      "insightsTitleFalse": {
+        "en": "Closed"
+      }
+    },
+    "measure_distance": {
+      "type": "number",
+      "title": {
+        "en": "Measured distance"
+      },
+      "uiComponent": "sensor",
+      "getable": true,
+      "setable": false,
+      "units": "cm",
+      "icon": "/assets/icon_distance.svg"
+    },
+    "measure_rssi": {
+      "type": "number",
+      "title": {
+        "en": "RSSI"
+      },
+      "uiComponent": "sensor",
+      "getable": true,
+      "setable": false,
+      "units": "dBm",
+      "icon": "/assets/icon_wifi.svg"
+    },
+    "vehicle_state": {
+      "type": "enum",
+      "title": {
+        "en": "Vehicle State"
+      },
+      "uiComponent": "sensor",
+      "values": [
+        {
+          "id": "0",
+          "title": {
+            "en": "Absent",
+            "no": "Borte"
+          }
+        },
+        {
+          "id": "1",
+          "title": {
+            "en": "Present",
+            "no": "Til stede"
+          }
+        },
+        {
+          "id": "2",
+          "title": {
+            "en": "Unknown",
+            "no": "Ukjent"
+          }
+        }
+      ],
+      "getable": true,
+      "setable": false,
+      "icon": "/assets/icon_presence.svg"
+    }
+  }
+}
