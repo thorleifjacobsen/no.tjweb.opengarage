@@ -20,5 +20,9 @@
       "id": "add_my_devices",
       "template": "add_devices"
     }
-  ]
+  ],
+  "images": {
+    "large": "drivers/garage-door/assets/images/large.png",
+    "small": "drivers/garage-door/assets/images/small.png"
+  }
 }

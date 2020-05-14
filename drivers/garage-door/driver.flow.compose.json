@@ -2,11 +2,11 @@
   "triggers": [
     {
       "id": "door_close",
-      "title": { "en": "When door state changes to closed" }
+      "title": { "en": "Garage door closed" }
     },
     {
       "id": "door_open",
-      "title": { "en": "When door state changes to open" }
+      "title": { "en": "Garage door opened" }
     },
     {
       "id": "vehicle_state_change",
@@ -16,37 +16,34 @@
   "conditions": [
     {
       "id": "is_open",
-      "title": {
-        "en": "Door is !{{open|closed}}"
-      }
+      "title": { "en": "Door is !{{open|closed}}" }
     },
     {
       "id": "vehicle_is_present",
-      "title": {
-        "en": "Vehicle is !{{present|absent}}"
-      }
+      "title": { "en": "Vehicle is !{{present|absent}}" },
+      "hint": "Vehicle presence settings should be configured on the OpenGarage device to work correctly."
     },
     {
       "id": "height_is",
-      "title": {
-        "en": "Distance sensor is !{{higher|lower}} than (centimeters)"
-      },
-      "args": [
-        {
+      "title": "Distance is !{{higher|lower}} than",
+      "hint": "Distance is given in centimetre.",
+      "args": [{
+          "type": "number",
           "name": "height",
-          "type": "number"
-        }
-      ]
+          "step": 1
+      }]
     }
   ],
   "actions": [
     {
       "id": "door_open",
-      "title": { "en": "Send 'Open' trigger to OpenGarage device. This only clicks the relay if the door is in closed state" }
+      "title": "Open garage door",
+      "hint": "Only triggers if the door is in opposite state. E.g. if door already is open this will not send a new tick to the relay."
     },
     {
       "id": "door_close",
-      "title": { "en": "Send 'Close' trigger to OpenGarage device. This only clicks the relay if the door is in open state" }
+      "title": "Close garage door",
+      "hint": "Only triggers if the door is in opposite state. E.g. if door already is closed this will not send a new tick to the relay."
     }
   ]
 }
