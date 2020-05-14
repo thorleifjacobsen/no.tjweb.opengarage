@@ -1,13 +1,13 @@
 {
   "id": "no.tjweb.opengarage",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "compatibility": ">=1.5.0",
   "sdk": 2,
   "name": {
     "en": "OpenGarage"
   },
   "description": {
-    "en": "Adds support for OpenGarage"
+    "en": "Adds support for OpenGarage.io WiFi garage door"
   },
   "category": [
     "security"
@@ -28,7 +28,7 @@
       {
         "id": "door_close",
         "title": {
-          "en": "When door state changes to closed"
+          "en": "Garage door closed"
         },
         "args": [
           {
@@ -41,7 +41,7 @@
       {
         "id": "door_open",
         "title": {
-          "en": "When door state changes to open"
+          "en": "Garage door opened"
         },
         "args": [
           {
@@ -84,6 +84,7 @@
         "title": {
           "en": "Vehicle is !{{present|absent}}"
         },
+        "hint": "Vehicle presence settings should be configured on the OpenGarage device to work correctly.",
         "args": [
           {
             "type": "device",
@@ -94,9 +95,8 @@
       },
       {
         "id": "height_is",
-        "title": {
-          "en": "Distance sensor is !{{higher|lower}} than (centimeters)"
-        },
+        "title": "Distance is !{{higher|lower}} than",
+        "hint": "Distance is given in centimetre.",
         "args": [
           {
             "type": "device",
@@ -104,8 +104,9 @@
             "filter": "driver_id=garage-door"
           },
           {
+            "type": "number",
             "name": "height",
-            "type": "number"
+            "step": 1
           }
         ]
       }
@@ -113,9 +114,8 @@
     "actions": [
       {
         "id": "door_open",
-        "title": {
-          "en": "Send 'Open' trigger to OpenGarage device. This only clicks the relay if the door is in closed state"
-        },
+        "title": "Open garage door",
+        "hint": "Only triggers if the door is in opposite state. E.g. if door already is open this will not send a new tick to the relay.",
         "args": [
           {
             "type": "device",
@@ -126,9 +126,8 @@
       },
       {
         "id": "door_close",
-        "title": {
-          "en": "Send 'Close' trigger to OpenGarage device. This only clicks the relay if the door is in open state"
-        },
+        "title": "Close garage door",
+        "hint": "Only triggers if the door is in opposite state. E.g. if door already is closed this will not send a new tick to the relay.",
         "args": [
           {
             "type": "device",
@@ -168,6 +167,10 @@
           "template": "add_devices"
         }
       ],
+      "images": {
+        "large": "drivers/garage-door/assets/images/large.png",
+        "small": "drivers/garage-door/assets/images/small.png"
+      },
       "settings": [
         {
           "type": "group",
@@ -181,7 +184,7 @@
               "label": {
                 "en": "IP Address"
               },
-              "value": "10.0.0.20"
+              "value": ""
             },
             {
               "id": "port",
