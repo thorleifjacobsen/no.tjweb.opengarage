@@ -11,17 +11,18 @@ class GarageDoorDevice extends Homey.Device {
 		this.doorCloseTrigger = new Homey.FlowCardTriggerDevice('door_close').register()
 		this.vehicleStateChangeSTrigger = new Homey.FlowCardTriggerDevice('vehicle_state_change').register()
 
-		this.doorCloseAction = new Homey.FlowCardAction('door_close').register().registerRunListener(async ( args, state ) => this.sendDoorCommand("close"))
-		this.doorOpenAction = new Homey.FlowCardAction('door_open').register().registerRunListener(async ( args, state ) => this.sendDoorCommand("open"))
+		this.doorCloseAction = new Homey.FlowCardAction('door_close').register().registerRunListener(async  ( args, state ) => args.device.sendDoorCommand("close"))
+		this.doorOpenAction = new Homey.FlowCardAction('door_open').register().registerRunListener(async ( args, state ) => args.device.sendDoorCommand("open"))
 
 		this.isOpen = new Homey.FlowCardCondition('is_open').register().registerRunListener(async ( args ) => {
-			return Promise.resolve(this.getCapabilityValue("door_state") == 'up')
+			args.device.log(`Checking if door is open, current state is: ${args.device.getCapabilityValue("door_state")}`)
+			return Promise.resolve(args.device.getCapabilityValue("door_state") == 'up')
 		})
 		this.vehicleIsPresent = new Homey.FlowCardCondition('vehicle_is_present').register().registerRunListener(async ( args ) => {
-			return Promise.resolve(this.getCapabilityValue("vehicle_state") == '1')
+			return Promise.resolve(args.device.getCapabilityValue("vehicle_state") == '1')
 		})
 		this.heightIs = new Homey.FlowCardCondition('height_is').register().registerRunListener(async ( args ) => {
-			return Promise.resolve(this.getCapabilityValue("measure_distance") > args.height)
+			return Promise.resolve(args.device.getCapabilityValue("measure_distance") > args.height)
 		})
 
 		// Debounce
@@ -43,13 +44,16 @@ class GarageDoorDevice extends Homey.Device {
 		return `http://${settings.ip}:${settings.port}/${path}`
 	}
 
-	async sendDoorCommand(command) {
+	async sendDoorCommand(command) { 
+
+		this.log(`Sending door command ${command} for ${this.getName()}`)	
 
 		const endpoint = this.createEndpoint(`cc?dkey=${this.getSetting('deviceKey')}&${command}=1`)
 		try {
 			this.log(`Trying to send: ${command} to ${this.getSetting('ip')}`)
 			const reply = await http.json(endpoint)
 			this.log(`Reply from device: ${reply.result}`)
+			this.log(`${endpoint}`)
 			if(reply.result == 1) {
 				this.log(`Door state successfully triggered: ${command}`)
 				if(this.lastData) this.setCapabilityValue("door_state", this.lastData.door == 1 ? 'up' : 'down')
