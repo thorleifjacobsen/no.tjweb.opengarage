@@ -4,5 +4,8 @@
   },
   "1.0.1": {
     "en": "Added new pictures for app and product, some text modifications and hints  added."
+  },
+  "1.0.2": {
+    "en": "Bug which fixed problem when you had more than 1 door."
   }
 }
