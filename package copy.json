@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "build": "tsc",
-    "lint": "eslint --ext .js,.ts --ignore-path .gitignore ."
+    "build": "tsc"
   },
   "devDependencies": {
     "@tsconfig/node12": "^1.0.9",
