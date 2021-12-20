@@ -30,6 +30,7 @@
         "title": {
           "en": "Garage door closed"
         },
+        "deprecated": true,
         "args": [
           {
             "type": "device",
@@ -43,6 +44,7 @@
         "title": {
           "en": "Garage door opened"
         },
+        "deprecated": true,
         "args": [
           {
             "type": "device",
@@ -71,6 +73,7 @@
         "title": {
           "en": "Door is !{{open|closed}}"
         },
+        "deprecated": true,
         "args": [
           {
             "type": "device",
@@ -121,6 +124,7 @@
         "id": "door_open",
         "title": "Open garage door",
         "hint": "Only triggers if the door is in opposite state. E.g. if door already is open this will not send a new tick to the relay.",
+        "deprecated": true,
         "args": [
           {
             "type": "device",
@@ -133,6 +137,7 @@
         "id": "door_close",
         "title": "Close garage door",
         "hint": "Only triggers if the door is in opposite state. E.g. if door already is closed this will not send a new tick to the relay.",
+        "deprecated": true,
         "args": [
           {
             "type": "device",

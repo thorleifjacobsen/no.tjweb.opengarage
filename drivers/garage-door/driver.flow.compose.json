@@ -2,11 +2,13 @@
   "triggers": [
     {
       "id": "door_close",
-      "title": { "en": "Garage door closed" }
+      "title": { "en": "Garage door closed" },
+      "deprecated": true
     },
     {
       "id": "door_open",
-      "title": { "en": "Garage door opened" }
+      "title": { "en": "Garage door opened" },
+      "deprecated": true
     },
     {
       "id": "vehicle_state_change",
@@ -16,7 +18,8 @@
   "conditions": [
     {
       "id": "is_open",
-      "title": { "en": "Door is !{{open|closed}}" }
+      "title": { "en": "Door is !{{open|closed}}" },
+      "deprecated": true
     },
     {
       "id": "vehicle_is_present",
@@ -39,12 +42,14 @@
     {
       "id": "door_open",
       "title": "Open garage door",
-      "hint": "Only triggers if the door is in opposite state. E.g. if door already is open this will not send a new tick to the relay."
+      "hint": "Only triggers if the door is in opposite state. E.g. if door already is open this will not send a new tick to the relay.",
+      "deprecated": true
     },
     {
       "id": "door_close",
       "title": "Close garage door",
-      "hint": "Only triggers if the door is in opposite state. E.g. if door already is closed this will not send a new tick to the relay."
+      "hint": "Only triggers if the door is in opposite state. E.g. if door already is closed this will not send a new tick to the relay.",
+      "deprecated": true
     }
   ]
 }
