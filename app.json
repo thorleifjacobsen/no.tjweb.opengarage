@@ -1,8 +1,8 @@
 {
   "id": "no.tjweb.opengarage",
-  "version": "1.0.2",
-  "compatibility": ">=1.5.0",
-  "sdk": 2,
+  "version": "1.1.0",
+  "compatibility": ">=5.0.0",
+  "sdk": 3,
   "name": {
     "en": "OpenGarage"
   },
@@ -95,7 +95,12 @@
       },
       {
         "id": "height_is",
-        "title": "Distance is !{{higher|lower}} than",
+        "title": {
+          "en": "Distance is !{{higher|lower}} than"
+        },
+        "titleFormatted": {
+          "en": "Distance is !{{higher|lower}} than [[height]]"
+        },
         "hint": "Distance is given in centimetre.",
         "args": [
           {
@@ -144,9 +149,9 @@
       "name": {
         "en": "Garage Door"
       },
-      "class": "other",
+      "class": "garagedoor",
       "capabilities": [
-        "door_state",
+        "garagedoor_closed",
         "vehicle_state",
         "measure_distance",
         "measure_rssi"
