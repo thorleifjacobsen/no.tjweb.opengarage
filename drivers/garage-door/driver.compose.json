@@ -3,8 +3,8 @@
   "name": {
     "en": "Garage Door"
   },
-  "class": "other",
-  "capabilities": ["door_state", "vehicle_state", "measure_distance", "measure_rssi"],
+  "class": "garagedoor",
+  "capabilities": ["garagedoor_closed", "vehicle_state", "measure_distance", "measure_rssi"],
   "pair": [
     {
       "id": "start"
