@@ -37,16 +37,16 @@
   }
 
   function setDisabled(value) {
-    ["ip","port","deviceKey","add"].forEach((item, index) => {
+    ["ip", "port", "deviceKey", "add"].forEach((item, index) => {
       elem(item).disabled = value;
     });
   }
 
   function getDetails() {
     return {
-      "ip"        : elem("ip").value,
-      "port"      : elem("port").value,
-      "deviceKey" : elem("deviceKey").value
+      "ip": elem("ip").value,
+      "port": elem("port").value,
+      "deviceKey": elem("deviceKey").value
     }
   }
 
@@ -54,37 +54,43 @@
 
     setDisabled(true);
     const details = getDetails();
-    if(details.ip == "") { setMessage("IP Address cannot be empty"); }
-    if(details.port == "") { setMessage("Port cannot be empty"); }
+    if (details.ip == "" || details.port == "") {
+      setMessage("IP Address or port number cannot be empty");
+      setDisabled(false);
+      return;
+    }
     setMessage(false);
 
-    Homey.emit( 'add', getDetails(), ( err, result ) => {
-      if(result.success == false) {
-        setDisabled(false);
-        setMessage("Could not add, be sure that the IP Address and port is correct. ("+result.data+")");
-      } else {
-        Homey.createDevice({
-          name: result.data.name,
-          data: { id: result.data.mac },
-          settings: { 
-            ip: getDetails().ip,
-            port: parseInt(getDetails().port),
-            deviceKey: getDetails().deviceKey,
-            pollingRate: 30
-          },
-          store: {}
-        }, (err, result) => {
-          if( err ) { 
-            setMessage(err); 
-            setDisabled(false);
-          } else {
+    Homey.emit('add', getDetails())
+      .then((result) => {
+        if (result.success == false) {
+          setDisabled(false);
+          setMessage("Could not add, be sure that the IP Address and port is correct. (" + result.message + ")");
+        } else {
+          setMessage("CREATING DEVICE");
+          console.log(result);
+          Homey.createDevice({
+            name: result.data.name,
+            data: { id: result.data.mac },
+            settings: {
+              ip: getDetails().ip,
+              port: parseInt(getDetails().port),
+              deviceKey: getDetails().deviceKey,
+              pollingRate: 30
+            },
+            store: {}
+          }).then((result) => {
+
             Homey.done();
-          }
-        })
-      }
-    });
+          }).catch(error => {
+
+            setMessage(error);
+            setDisabled(false);
+          })
+        }
+      });
   });
 
-  
 
-  </script>
+
+</script>
