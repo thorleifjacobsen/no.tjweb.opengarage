@@ -25,7 +25,8 @@
     },
     {
       "id": "height_is",
-      "title": "Distance is !{{higher|lower}} than",
+      "title": { "en": "Distance is !{{higher|lower}} than" },
+      "titleFormatted": { "en": "Distance is !{{higher|lower}} than [[height]]" },
       "hint": "Distance is given in centimetre.",
       "args": [{
           "type": "number",
