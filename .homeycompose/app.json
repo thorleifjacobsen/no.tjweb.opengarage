@@ -1,0 +1,37 @@
+{
+  "id": "no.tjweb.opengarage",
+  "version": "1.1.0",
+  "compatibility": ">=5.0.0",
+  "sdk": 3,
+  "name": {
+    "en": "OpenGarage"
+  },
+  "description": {
+    "en": "Adds support for OpenGarage.io WiFi garage door"
+  },
+  "category": [
+    "security"
+  ],
+  "permissions": [
+    "homey:manager:api"
+  ],
+  "images": {
+    "large": "/assets/images/large.png",
+    "small": "/assets/images/small.png"
+  },
+  "author": {
+    "name": "Thorleif Jacobsen",
+    "email": "thorleif@tjweb.no"
+  },
+  "bugs": {
+    "url": "https://github.com/thorleifjaocbsen/no.tjweb.opengarage/issues"
+  },
+  "source": "https://github.com/thorleifjaocbsen/no.tjweb.opengarage",
+  "contributing": {
+    "donate": {
+      "paypal": {
+        "username": "toffe"
+      }
+    }
+  }
+}
