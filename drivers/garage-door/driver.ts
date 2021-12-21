@@ -24,8 +24,7 @@ class GarageDoorDriver extends Homey.Driver {
 					"\n\n" +
 					"**Triggers:** Garage door open/closed\n" +
 					"**Conditions:** Door is open/closed\n" +
-					"**Actions:** Open/Close garage door\n\n" +
-					"This message will be removed in a future update! Sorry <3"
+					"**Actions:** Open/Close garage door\n\n"
 			});
 		}
 	}
