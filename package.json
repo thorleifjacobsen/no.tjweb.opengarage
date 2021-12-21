@@ -1,5 +1,9 @@
 {
   "name": "no.tjweb.opengarage",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thorleifjaocbsen/no.tjweb.opengarage"
+  },
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
