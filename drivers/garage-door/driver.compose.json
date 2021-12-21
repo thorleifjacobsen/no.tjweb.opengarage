@@ -11,7 +11,7 @@
     }
   ],
   "images": {
-    "large": "drivers/garage-door/assets/images/large.png",
-    "small": "drivers/garage-door/assets/images/small.png"
+    "large": "{{driverAssetsPath}}/images/large.png",
+    "small": "{{driverAssetsPath}}/images/small.png"
   }
 }

@@ -12,15 +12,16 @@ class GarageDoorDriver extends Homey.Driver {
 		/* Up this to show the below message again */
 		const deprecrationNotification = 1;
 
+		/* First time this is "null", it will be set to 1 once this if's run once! */
 		if (this.homey.settings.get("deprecrationNotification") < deprecrationNotification) {
 
 			this.log("Showing deprecration notification");
 			this.homey.settings.set("deprecrationNotification", deprecrationNotification);
 			this.homey.notifications.createNotification({
-				excerpt: "**Breaking changes:**\nIn future updates some flows may be removed. " +
-					"To avoid breaking changes in your system replace all flows related to " +
-					"the garage door state. All deprecrated flows are invisible so just replace " +
-					"with those you can see who fits your use case. The affected flows are: " +
+				excerpt: "**Breaking changes:**\nIn future updates some flow cards may be removed. " +
+					"To avoid breaking changes in your system replace all flow cards related to " +
+					"the garage door state. All deprecrated flow cards are invisible so just replace " +
+					"with those you can see who fits your use case. The affected flow cards are: " +
 					"\n\n" +
 					"**Triggers:** Garage door open/closed\n" +
 					"**Conditions:** Door is open/closed\n" +
@@ -38,11 +39,8 @@ class GarageDoorDriver extends Homey.Driver {
 			const deviceOptionsUrl = `http://${device.ip}:${device.port}/jc`
 			const deviceControlUrl = `http://${device.ip}:${device.port}/co?dkey=${device.deviceKey}`
 
-			const returnObj = {
-				success: false,
-				message: "",
-				data: {}
-			}
+			const failObject = { success: false,	message: "" }
+
 			/* Trying to get device options to return to client */
 			try {
 				let response = await axios.get(deviceOptionsUrl);
@@ -63,23 +61,20 @@ class GarageDoorDriver extends Homey.Driver {
 					else {
 
 						this.log("Device Key not accepted, denying device");
-						returnObj.success = false;
-						returnObj.message = this.homey.__("errors.wrong_devicekey");
+						failObject.message = this.homey.__("errors.wrong_devicekey");
 					}
 				}
 				else {
 
 					this.log("Data found in options request was not as expected (rejecting): ", state)
-					returnObj.success = false;
-					returnObj.message = this.homey.__("errors.unexpected_response");
+					failObject.message = this.homey.__("errors.unexpected_response");
 				}
 			}
 			catch (error) {
-				returnObj.success = false;
-				returnObj.message = this.homey.__("errors.error_when_trying_key");
+				failObject.message = this.homey.__("errors.error_when_trying_key");
 			}
 
-			return returnObj;
+			return failObject;
 		})
 	}
 }

@@ -1,13 +1,15 @@
 
 import axios from 'axios';
-import Homey, { FlowCardAction, FlowCardCondition, FlowCardTrigger, FlowCardTriggerDevice } from 'homey';
+import Homey from 'homey';
 import { OGState, OGCommand, OGResponse } from './definations';
 
 class GarageDoorDevice extends Homey.Device {
 
-	private doorOpenTrigger!: FlowCardTriggerDevice;
-	private doorCloseTrigger!: FlowCardTriggerDevice;
-	private vehicleStateChangeTrigger!: FlowCardTriggerDevice;
+	/* Since we dont use "constructor" but oninit these fails. */
+	/* adding ! tells typescript to trust me, i'm gonna init them */
+	private doorOpenTrigger!: Homey.FlowCardTriggerDevice;
+	private doorCloseTrigger!: Homey.FlowCardTriggerDevice;
+	private vehicleStateChangeTrigger!: Homey.FlowCardTriggerDevice;
 
 	private debounceActive: boolean = false;
 	private debounceTimer!: NodeJS.Timeout;
@@ -15,8 +17,6 @@ class GarageDoorDevice extends Homey.Device {
 	private lastData: OGState | undefined;
 
 	async onInit() {
-		// Init flows
-
 		/* Migration */
 		if (this.hasCapability('garagedoor_closed') === false) {
 			this.log(`Adding new garagedoor_closed capability to ${this.getName()}`);
@@ -34,12 +34,12 @@ class GarageDoorDevice extends Homey.Device {
 		}
 
 		
-		
-		this.doorOpenTrigger = this.homey.flow.getDeviceTriggerCard('door_open');
-		this.doorCloseTrigger = this.homey.flow.getDeviceTriggerCard('door_close');
-
+		/* Triggers */
+		this.doorOpenTrigger           = this.homey.flow.getDeviceTriggerCard('door_open');
+		this.doorCloseTrigger          = this.homey.flow.getDeviceTriggerCard('door_close');
 		this.vehicleStateChangeTrigger = this.homey.flow.getDeviceTriggerCard('vehicle_state_change');
 
+		/* Actions */
 		this.homey.flow.getActionCard('door_close').registerRunListener(async (args) => {
 			let device: GarageDoorDevice = args.device;
 			device.sendDoorCommand(OGCommand.close);
@@ -50,6 +50,7 @@ class GarageDoorDevice extends Homey.Device {
 			device.sendDoorCommand(OGCommand.open);
 		});
 
+		/* Conditions */
 		this.homey.flow.getConditionCard('is_open').registerRunListener(async (args) => {
 			let device: GarageDoorDevice = args.device;
 			return ! device.getCapabilityValue("garagedoor_closed");
@@ -63,12 +64,10 @@ class GarageDoorDevice extends Homey.Device {
 			return args.device.getCapabilityValue("measure_distance") > args.height;
 		});
 
-		// Debounce
-
-		// Init capabiltiies
+		/* Capabilities */
 		this.registerCapabilityListener('garagedoor_closed', this.doorStateChange.bind(this))
 
-		// Start polling
+		/* Start polling data */
 		this.log(`Starting timer for device: ${this.getName()}`)
 		this.pollData()
 
@@ -91,8 +90,7 @@ class GarageDoorDevice extends Homey.Device {
 			const response: OGResponse = res.data;
 
 			if (response.result == 1) {
-				// TODO: See if this is nessesary?
-				//if (this.lastData) this.setCapabilityValue("door_state", this.lastData.door == 1 ? 'up' : 'down')
+
 				setTimeout(() => { this.pollData(true) }, this.getSetting('openCloseTime') * 1000)
 				return Promise.resolve()
 			} else {
@@ -151,11 +149,11 @@ class GarageDoorDevice extends Homey.Device {
 
 	parseData(data: OGState) {
 
-		// Update lastData
+		/* Update lastData */
 		this.lastData = data
 		const isDoorClosed = data.door == 0;
 
-		// Check if changed, if so call trigger something
+		/* Check if changed, if so call trigger something */
 		if (this.getCapabilityValue("garagedoor_closed") != isDoorClosed) {
 			if (isDoorClosed) { this.doorCloseTrigger?.trigger(this).catch(this.error).then(() => this.log("Trigger close door")) }
 			else { this.doorOpenTrigger?.trigger(this).catch(this.error).then(() => this.log("Trigger open door")) }
@@ -165,8 +163,10 @@ class GarageDoorDevice extends Homey.Device {
 		if (this.getCapabilityValue("measure_distance") != data.dist)
 			this.setCapabilityValue("measure_distance", data.dist)
 
-		if (this.getCapabilityValue("vehicle_state") != data.vehicle.toString())
+		if (this.getCapabilityValue("vehicle_state") != data.vehicle.toString()) {
 			this.setCapabilityValue("vehicle_state", data.vehicle.toString())
+			this.vehicleStateChangeTrigger.trigger(this).catch(this.error).then(() => this.log("Trigger vehicle change"))
+		}
 
 		if (this.getCapabilityValue("measure_rssi") != data.rssi)
 			this.setCapabilityValue("measure_rssi", data.rssi)
