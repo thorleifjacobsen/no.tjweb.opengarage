@@ -8,7 +8,29 @@ class GarageDoorDriver extends Homey.Driver {
 	async onInit() {
 
 		this.log('GarageDoorDriver has been inited');
+
+		/* Up this to show the below message again */
+		const deprecrationNotification = 1;
+
+		if (this.homey.settings.get("deprecrationNotification") < deprecrationNotification) {
+
+			this.log("Showing deprecration notification");
+			this.homey.settings.set("deprecrationNotification", deprecrationNotification);
+			this.homey.notifications.createNotification({
+				excerpt: "**Breaking changes:**\nIn future updates some flows may be removed. " +
+					"To avoid breaking changes in your system replace all flows related to " +
+					"the garage door state. All deprecrated flows are invisible so just replace " +
+					"with those you can see who fits your use case. The affected flows are: " +
+					"\n\n" +
+					"**Triggers:** Garage door open/closed\n" +
+					"**Conditions:** Door is open/closed\n" +
+					"**Actions:** Open/Close garage door\n\n" +
+					"This message will be removed in a future update! Sorry <3"
+			});
+		}
 	}
+
+
 
 	async onPair(session: any) {
 
