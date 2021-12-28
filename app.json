@@ -1,7 +1,7 @@
 {
   "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
   "id": "no.tjweb.opengarage",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "compatibility": ">=5.0.0",
   "sdk": 3,
   "brandColor": "#0c3d4e",
@@ -178,8 +178,8 @@
         }
       ],
       "images": {
-        "large": "drivers/garage-door/assets/images/large.png",
-        "small": "drivers/garage-door/assets/images/small.png"
+        "large": "/drivers/garage-door/assets/images/large.png",
+        "small": "/drivers/garage-door/assets/images/small.png"
       },
       "settings": [
         {
