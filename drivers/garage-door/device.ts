@@ -9,13 +9,20 @@ class GarageDoorDevice extends Homey.Device {
 	/* adding ! tells typescript to trust me, i'm gonna init them */
 	private doorOpenTrigger!: Homey.FlowCardTriggerDevice;
 	private doorCloseTrigger!: Homey.FlowCardTriggerDevice;
-	private vehicleStateChangeTrigger!: Homey.FlowCardTriggerDevice;
+	private carStateChangeTrigger!: Homey.FlowCardTriggerDevice;
+
+	private doorCloseAction!: Homey.FlowCardAction;
+	private doorOpenAction!: Homey.FlowCardAction;
+
+	/* Conditions */
+	private isOpenCondition!: Homey.FlowCardCondition;
+	private carIsPresentCondition!: Homey.FlowCardCondition;
+	private heightIsCondition!: Homey.FlowCardCondition;
+
 
 	private debounceActive: boolean = false;
 
 	private pollTimer!: NodeJS.Timeout;
-
-	private lastData: OGState | undefined;
 
 	async onInit() {
 
@@ -35,38 +42,24 @@ class GarageDoorDevice extends Homey.Device {
 			await this.removeCapability('door_state');
 		}
 
-
-		/* Triggers */
+		/* Define cards */
 		this.doorOpenTrigger = this.homey.flow.getDeviceTriggerCard('door_open');
 		this.doorCloseTrigger = this.homey.flow.getDeviceTriggerCard('door_close');
-		this.vehicleStateChangeTrigger = this.homey.flow.getDeviceTriggerCard('vehicle_state_change');
+		this.carStateChangeTrigger = this.homey.flow.getDeviceTriggerCard('vehicle_state_change');
+		this.doorCloseAction = this.homey.flow.getActionCard('door_close')
+		this.doorOpenAction = this.homey.flow.getActionCard('door_open')
+		this.isOpenCondition = this.homey.flow.getConditionCard('is_open')
+		this.carIsPresentCondition = this.homey.flow.getConditionCard('vehicle_is_present')
+		this.heightIsCondition = this.homey.flow.getConditionCard('height_is')
 
 		/* Actions */
-		this.homey.flow.getActionCard('door_close')
-			.registerRunListener(async ({ device }: { device: GarageDoorDevice }) => {
-				device.sendDoorCommand(OGCommand.close);
-			});
-
-		this.homey.flow.getActionCard('door_open')
-			.registerRunListener(async ({ device }: { device: GarageDoorDevice }) => {
-				device.sendDoorCommand(OGCommand.open);
-			});
+		this.doorCloseAction.registerRunListener(async ({ device }) => { device.sendDoorCommand(OGCommand.close); });
+		this.doorOpenAction.registerRunListener(async ({ device }) => { device.sendDoorCommand(OGCommand.open); });
 
 		/* Conditions */
-		this.homey.flow.getConditionCard('is_open')
-			.registerRunListener(async ({ device }: { device: GarageDoorDevice }) => {
-				return !device.getCapabilityValue("garagedoor_closed");
-			});
-
-		this.homey.flow.getConditionCard('vehicle_is_present')
-			.registerRunListener(({ device }: { device: GarageDoorDevice }) => {
-				return device.getCapabilityValue("vehicle_state") == '1'
-			});
-
-		this.homey.flow.getConditionCard('height_is')
-			.registerRunListener(async ({ height, device }: { height: number, device: GarageDoorDevice }) => {
-				return device.getCapabilityValue("measure_distance") > height;
-			});
+		this.isOpenCondition.registerRunListener(async ({ device }) => !device.getCapabilityValue("garagedoor_closed"));
+		this.carIsPresentCondition.registerRunListener(({ device }) => device.getCapabilityValue("vehicle_state") == '1');
+		this.heightIsCondition.registerRunListener(async ({ height, device }) => device.getCapabilityValue("measure_distance") > height);
 
 		/* Capabilities */
 		this.registerCapabilityListener('garagedoor_closed', this.changeDoorState.bind(this))
@@ -153,14 +146,11 @@ class GarageDoorDevice extends Homey.Device {
 			.finally(() => {
 				this.pollTimer = setTimeout(() => { this.pollData() }, this.getSetting('pollingRate') * 1000);
 			})
-
-		//this.log("Polling data, current pollingrate is set to:", this.getSetting('pollingRate'))
 	}
 
 	parseData(data: OGState) {
 
 		/* Update lastData */
-		this.lastData = data
 		const isDoorClosed = data.door == 0;
 
 		/* Check if changed, if so call trigger something */
@@ -175,7 +165,7 @@ class GarageDoorDevice extends Homey.Device {
 
 		if (this.getCapabilityValue("vehicle_state") != data.vehicle.toString()) {
 			this.setCapabilityValue("vehicle_state", data.vehicle.toString())
-			this.vehicleStateChangeTrigger.trigger(this).catch(this.error).then(() => this.log("Trigger vehicle change"))
+			this.carStateChangeTrigger.trigger(this).catch(this.error).then(() => this.log("Trigger vehicle change"))
 		}
 
 		if (this.getCapabilityValue("measure_rssi") != data.rssi)
