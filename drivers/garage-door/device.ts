@@ -7,10 +7,13 @@ class GarageDoorDevice extends Homey.Device {
 
 	/* Since we dont use "constructor" but oninit these fails. */
 	/* adding ! tells typescript to trust me, i'm gonna init them */
+
+	/* Triggers */
 	private doorOpenTrigger!: Homey.FlowCardTriggerDevice;
 	private doorCloseTrigger!: Homey.FlowCardTriggerDevice;
 	private carStateChangeTrigger!: Homey.FlowCardTriggerDevice;
 
+	/* Actions */
 	private doorCloseAction!: Homey.FlowCardAction;
 	private doorOpenAction!: Homey.FlowCardAction;
 
@@ -19,9 +22,7 @@ class GarageDoorDevice extends Homey.Device {
 	private carIsPresentCondition!: Homey.FlowCardCondition;
 	private heightIsCondition!: Homey.FlowCardCondition;
 
-
 	private debounceActive: boolean = false;
-
 	private pollTimer!: NodeJS.Timeout;
 	private isPolling: boolean = false;
 
@@ -34,7 +35,7 @@ class GarageDoorDevice extends Homey.Device {
 		}
 		if (this.getClass() !== 'garagedoor') {
 			this.log(`Changing class on ${this.getName()} from ${this.getClass()} to garagedoor`);
-			await this.setClass('garagedoor')
+			await this.setClass('garagedoor');
 		};
 
 		/* Deprecation */
@@ -47,11 +48,11 @@ class GarageDoorDevice extends Homey.Device {
 		this.doorOpenTrigger = this.homey.flow.getDeviceTriggerCard('door_open');
 		this.doorCloseTrigger = this.homey.flow.getDeviceTriggerCard('door_close');
 		this.carStateChangeTrigger = this.homey.flow.getDeviceTriggerCard('vehicle_state_change');
-		this.doorCloseAction = this.homey.flow.getActionCard('door_close')
-		this.doorOpenAction = this.homey.flow.getActionCard('door_open')
-		this.isOpenCondition = this.homey.flow.getConditionCard('is_open')
-		this.carIsPresentCondition = this.homey.flow.getConditionCard('vehicle_is_present')
-		this.heightIsCondition = this.homey.flow.getConditionCard('height_is')
+		this.doorCloseAction = this.homey.flow.getActionCard('door_close');
+		this.doorOpenAction = this.homey.flow.getActionCard('door_open');
+		this.isOpenCondition = this.homey.flow.getConditionCard('is_open');
+		this.carIsPresentCondition = this.homey.flow.getConditionCard('vehicle_is_present');
+		this.heightIsCondition = this.homey.flow.getConditionCard('height_is');
 
 		/* Actions */
 		this.doorCloseAction.registerRunListener(async ({ device }) => { device.sendDoorCommand(OGCommand.close); });
@@ -63,23 +64,22 @@ class GarageDoorDevice extends Homey.Device {
 		this.heightIsCondition.registerRunListener(async ({ height, device }) => device.getCapabilityValue("measure_distance") > height);
 
 		/* Capabilities */
-		this.registerCapabilityListener('garagedoor_closed', this.changeDoorState.bind(this))
+		this.registerCapabilityListener('garagedoor_closed', this.changeDoorState.bind(this));
 
 		/* Start polling data */
-		this.log(`Starting timer for device: ${this.getName()}`)
+		this.log(`Starting timer for device: ${this.getName()}`);
 		this.pollData();
-
 	}
 
 	createEndpoint(path: string): string {
 
-		const settings = this.getSettings()
-		return `http://${settings.ip}:${settings.port}/${path}`
+		const settings = this.getSettings();
+		return `http://${settings.ip}:${settings.port}/${path}`;
 	}
 
 	sendDoorCommand(command: OGCommand): Promise<void> {
 
-		this.log(`Sending door command ${command} for ${this.getName()}`)
+		this.log(`Sending door command ${command} for ${this.getName()}`);
 
 		return new Promise(async (resolve, reject) => {
 			try {
@@ -95,14 +95,14 @@ class GarageDoorDevice extends Homey.Device {
 					this.pollTimer = setTimeout(() => { this.pollData() }, this.getSetting('openCloseTime') * 1000);
 
 					// Done!
-					resolve()
+					resolve();
 				} else {
 
-					reject(response.result)
+					reject(response.result);
 				}
 			} catch (error) {
 
-				reject(error)
+				reject(error);
 			}
 		})
 	}
@@ -129,6 +129,7 @@ class GarageDoorDevice extends Homey.Device {
 					// Resolve
 					resolve();
 				} catch (error) {
+
 					reject(this.homey.__("errors.error_when_changing_door_state", { error }));
 				}
 			}
@@ -161,8 +162,9 @@ class GarageDoorDevice extends Homey.Device {
 		/* Update lastData */
 		const isDoorClosed = data.door == 0;
 
-		/* This should only be differnt if changed by external means. */
+		/* This should only be different if changed by external means. */
 		if (this.getCapabilityValue("garagedoor_closed") != isDoorClosed) {
+
 			/* It has changed! Lets update the state of garagedoor_closed */
 			this.setCapabilityValue("garagedoor_closed", isDoorClosed);
 
@@ -170,10 +172,15 @@ class GarageDoorDevice extends Homey.Device {
 			this.triggerDeprecatedOpenCloseFlow(isDoorClosed);
 		}
 
-		if (this.getCapabilityValue("measure_distance") != data.dist)
-			this.setCapabilityValue("measure_distance", data.dist)
+		/* Update distance if change is detected */
+		if (this.getCapabilityValue("measure_distance") != data.dist) {
 
+			this.setCapabilityValue("measure_distance", data.dist);
+		}
+
+		/* Update vehicle state if state is changed */ 
 		if (this.getCapabilityValue("vehicle_state") != data.vehicle.toString()) {
+
 			this.setCapabilityValue("vehicle_state", data.vehicle.toString())
 			this.carStateChangeTrigger
 				.trigger(this)
@@ -181,8 +188,11 @@ class GarageDoorDevice extends Homey.Device {
 				.catch((err) => this.error(`Trigger vehicle change failed: ${err}`))
 		}
 
-		if (this.getCapabilityValue("measure_rssi") != data.rssi)
+		/* Update RSSI if changed */
+		if (this.getCapabilityValue("measure_rssi") != data.rssi) {
+
 			this.setCapabilityValue("measure_rssi", data.rssi)
+		}
 	}
 
 	// This is just to keep backwards compability.
