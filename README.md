@@ -52,6 +52,15 @@ homey login
 homey app install
 ```
 
+## Running the emulator
+
+```
+npx ts-node OpenGarageEmulator/app.ts
+```
+
+Default port: 1987
+Default device key: test
+
 ## Special Thanks
 
 [Runely](https://github.com/runely) - I kinda stole this whole readme format from you, also used ur code for Remootio for reference when using the garagedoor capability.
