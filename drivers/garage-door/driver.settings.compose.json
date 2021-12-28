@@ -75,6 +75,22 @@
     },
     "children": [
       {
+        "id": "riv",
+        "type": "number",
+        "label": {
+          "en": "Report interval"
+        },
+        "value": 5,
+        "min": 1,
+        "max": 60,
+        "hint": {
+          "en": "This decides how often the OpenGarage should update it's distance reprorts and door / vehicle status. Default: 5 seconds."
+        },
+        "units": {
+          "en": "seconds"
+        }
+      },
+      {
         "id": "dth",
         "type": "number",
         "label": {
@@ -165,9 +181,9 @@
         "id": "aoo",
         "type": "checkbox",
         "value": false,
-        "label": { "en": "Do not alarm when opening" },
+        "label": { "en": "Alarm on opening" },
         "hint": {
-          "en": "If this is checked the device will not signal while opening. (Requires OpenGarage Firmware v1.1.2)"
+          "en": "If this is checked the device will signal while opening. If not it will open instantly. (Requires OpenGarage Firmware v1.1.2)"
         }
       }
     ]

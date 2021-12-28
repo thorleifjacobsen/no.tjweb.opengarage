@@ -28,6 +28,7 @@ export interface OGSettings extends Object {
 	distanceReadingInterval?: number;
 	mode?: string;
 	alarm?: string;
+	riv?: number;
 	dth?: number;
 	vth?: number;
 	cdt?: number;

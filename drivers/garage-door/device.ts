@@ -1,6 +1,7 @@
 
 import { doesNotThrow } from 'assert';
 import axios from 'axios';
+import { open } from 'fs';
 import Homey from 'homey';
 import { OGState, OGCommand, OGResponse, OGSettings, OGOptions } from './definations';
 
@@ -78,6 +79,7 @@ class GarageDoorDevice extends Homey.Device {
 	async onSettings({ newSettings, changedKeys }: { newSettings: OGSettings, changedKeys: Array<string> }) {
 		let queryParam = "";
 
+		if(changedKeys.includes("riv") && newSettings.riv) queryParam += "&riv="+newSettings.riv;
 		if(changedKeys.includes("dth") && newSettings.dth) queryParam += "&dth="+newSettings.dth;
 		if(changedKeys.includes("vth") && newSettings.vth) queryParam += "&vth="+newSettings.vth;
 		if(changedKeys.includes("cdt") && newSettings.cdt) queryParam += "&cdt="+newSettings.cdt;
@@ -92,7 +94,7 @@ class GarageDoorDevice extends Homey.Device {
 			try {
 				
 				this.log(`Trying to set OpenGarage settings with config string: ${queryParam}`);
-				
+
 				const res = await axios.get(endpoint);
 				const response: OGResponse = res.data;
 
@@ -124,9 +126,24 @@ class GarageDoorDevice extends Homey.Device {
 				if (response.result == 1) {
 
 					// Stop the poll timer, we know something is moving and we can wait 
-					// until the openCloseTime to poll again.
+					// until the calculated open/close time to poll again.
+					
+					// Start with 0 seconds
+					let openCloseTime = 0;
+					// Add the user defined open / close time
+					openCloseTime += this.getSetting('openCloseTime');
+					// Add the time it takes for the device to update its readouts
+					openCloseTime += this.getSetting('riv');
+					// Alarm time 
+					let alarm = this.getSetting('alm');
+					if(!this.getSetting('aoo') && command == OGCommand.open) { alarm = 0; }
+					if(alarm == 1) { openCloseTime += 5; } /* 5 second alarm */
+					if(alarm == 2) { openCloseTime += 10; } /* 5 second alarm */
+					
+					this.log(`Waiting ${openCloseTime} seconds to poll data.`)
+
 					clearTimeout(this.pollTimer);
-					this.pollTimer = setTimeout(() => { this.pollData() }, this.getSetting('openCloseTime') * 1000);
+					this.pollTimer = setTimeout(() => { this.pollData() }, openCloseTime * 1000);
 
 					// Done!
 					resolve();
@@ -237,12 +254,13 @@ class GarageDoorDevice extends Homey.Device {
 			const deviceOptions = res.data;
 
 			const deviceSettings: OGSettings = {
-				aoo: !!deviceOptions.aoo, /* Convert to true / false */
-				alm: deviceOptions.alm?.toString() || "0", /* Convert to string and if not set default to 0 */
-				dri: deviceOptions.dri,
-				cdt: deviceOptions.cdt,
+				riv: deviceOptions.riv,
+				dth: deviceOptions.dth,
 				vth: deviceOptions.vth,
-				dth: deviceOptions.dth
+				cdt: deviceOptions.cdt,
+				dri: deviceOptions.dri,
+				alm: deviceOptions.alm?.toString() || "0", /* Convert to string and if not set default to 0 */
+				aoo: !!deviceOptions.aoo /* Convert to true / false */
 			}
 			
 			this.setSettings(deviceSettings);
