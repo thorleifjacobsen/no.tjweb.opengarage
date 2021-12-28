@@ -2,6 +2,7 @@
   "errors": {
     "debounce": "A command have just been sent, please wait 5 seconds to send a new one",
     "unknown": "Unknown error occured: __error__",
+    "error_when_changing_door_state": "Error occured when setting door state: __error__",
     "polling": "Error polling data from device. Error given: __error__",
     "wrong_devicekey": "Device key not accepted!",
     "error_when_trying_key": "Unknown error when trying device key!",
