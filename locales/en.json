@@ -1,6 +1,6 @@
 {
   "errors": {
-    "debounce": "A command have just been sent, please wait 5 seconds to send a new one",
+    "debounce": "A command have just been sent, please wait 1 seconds to send a new one",
     "unknown": "Unknown error occured: __error__",
     "error_when_changing_door_state": "Error occured when setting door state: __error__",
     "polling": "Error polling data from device. Error given: __error__",

@@ -118,9 +118,6 @@ class GarageDoorDevice extends Homey.Device {
 		return new Promise(async (resolve, reject) => {
 
 			if (this.debounceActive) {
-				if (this.lastData) {
-					this.setCapabilityValue("garagedoor_closed", this.lastData.door == 0);
-				}
 				reject(this.homey.__("errors.debounce"));
 			} else {
 				try {
@@ -130,7 +127,7 @@ class GarageDoorDevice extends Homey.Device {
 
 					// Activate debounce
 					this.debounceActive = true;
-					setTimeout(() => { this.debounceActive = false; }, 5000);
+					setTimeout(() => { this.debounceActive = false; }, 1000);
 
 					// Resolve
 					resolve();
