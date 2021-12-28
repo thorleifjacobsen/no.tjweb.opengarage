@@ -23,6 +23,7 @@ class GarageDoorDevice extends Homey.Device {
 	private debounceActive: boolean = false;
 
 	private pollTimer!: NodeJS.Timeout;
+	private isPolling: boolean = false;
 
 	async onInit() {
 
@@ -66,7 +67,7 @@ class GarageDoorDevice extends Homey.Device {
 
 		/* Start polling data */
 		this.log(`Starting timer for device: ${this.getName()}`)
-		this.pollTimer = setTimeout(() => { this.pollData() }, this.getSetting('pollingRate') * 1000);
+		this.pollData();
 
 	}
 
@@ -134,6 +135,9 @@ class GarageDoorDevice extends Homey.Device {
 
 	pollData(): void {
 
+		if (this.isPolling) return; 
+		this.isPolling = true;
+
 		axios.get(this.createEndpoint('jc'))
 			.then(response => {
 				this.parseData(response.data as OGState);
@@ -144,6 +148,7 @@ class GarageDoorDevice extends Homey.Device {
 				this.setUnavailable(this.homey.__("errors.polling", { error: error.code }));
 			})
 			.finally(() => {
+				this.isPolling = false;
 				this.pollTimer = setTimeout(() => { this.pollData() }, this.getSetting('pollingRate') * 1000);
 			})
 	}
