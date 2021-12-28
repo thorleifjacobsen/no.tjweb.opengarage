@@ -1,7 +1,8 @@
 
+import { doesNotThrow } from 'assert';
 import axios from 'axios';
 import Homey from 'homey';
-import { OGState, OGCommand, OGResponse } from './definations';
+import { OGState, OGCommand, OGResponse, OGSettings, OGOptions } from './definations';
 
 class GarageDoorDevice extends Homey.Device {
 
@@ -66,9 +67,42 @@ class GarageDoorDevice extends Homey.Device {
 		/* Capabilities */
 		this.registerCapabilityListener('garagedoor_closed', this.changeDoorState.bind(this));
 
+		/* Lets get the stored settings for the thing and update our own settings */
+		await this.updateOptions();
+
 		/* Start polling data */
 		this.log(`Starting timer for device: ${this.getName()}`);
 		this.pollData();
+	}
+
+	async onSettings({ newSettings, changedKeys }: { newSettings: OGSettings, changedKeys: Array<string> }) {
+		let queryParam = "";
+
+		if(changedKeys.includes("dth") && newSettings.dth) queryParam += "&dth="+newSettings.dth;
+		if(changedKeys.includes("vth") && newSettings.vth) queryParam += "&vth="+newSettings.vth;
+		if(changedKeys.includes("cdt") && newSettings.cdt) queryParam += "&cdt="+newSettings.cdt;
+		if(changedKeys.includes("dri") && newSettings.dri) queryParam += "&dri="+newSettings.dri;
+		if(changedKeys.includes("alm") && newSettings.alm) queryParam += "&alm="+newSettings.alm;
+		if(changedKeys.includes("aoo") && newSettings.aoo) queryParam += "&aoo="+(+newSettings.aoo);
+		
+		if (queryParam.length > 0) {
+
+			const endpoint = this.createEndpoint(`co?dkey=${newSettings.deviceKey}${queryParam}`);
+
+			try {
+				
+				this.log(`Trying to set OpenGarage settings with config string: ${queryParam}`);
+				
+				const res = await axios.get(endpoint);
+				const response: OGResponse = res.data;
+
+				if (response.result == 2) throw new Error(`Device key is incorrect or missing. Please confirm the device key and try again.`);
+				if (response.result != 1) throw new Error(`Unknown error occured when trying to update device settings. Error: ${response.result}`);
+			} catch (error: any) {
+
+				throw new Error(error);
+			}
+		}
 	}
 
 	createEndpoint(path: string): string {
@@ -178,7 +212,7 @@ class GarageDoorDevice extends Homey.Device {
 			this.setCapabilityValue("measure_distance", data.dist);
 		}
 
-		/* Update vehicle state if state is changed */ 
+		/* Update vehicle state if state is changed */
 		if (this.getCapabilityValue("vehicle_state") != data.vehicle.toString()) {
 
 			this.setCapabilityValue("vehicle_state", data.vehicle.toString())
@@ -195,14 +229,38 @@ class GarageDoorDevice extends Homey.Device {
 		}
 	}
 
+	async updateOptions() {
+
+		try {
+
+			const res = await axios.get<OGOptions>(this.createEndpoint("jo"));
+			const deviceOptions = res.data;
+
+			const deviceSettings: OGSettings = {
+				aoo: !!deviceOptions.aoo, /* Convert to true / false */
+				alm: deviceOptions.alm?.toString() || "0", /* Convert to string and if not set default to 0 */
+				dri: deviceOptions.dri,
+				cdt: deviceOptions.cdt,
+				vth: deviceOptions.vth,
+				dth: deviceOptions.dth
+			}
+			
+			this.setSettings(deviceSettings);
+			
+		} catch(error) {
+
+			this.error("Error occured when updating options", error)
+		}
+	}
+
 	// This is just to keep backwards compability.
 	triggerDeprecatedOpenCloseFlow(didDoorJustClose: boolean) {
-		
+
 		// DEPRECATED: Also trigger deprecrated flows
 		(didDoorJustClose ? this.doorCloseTrigger : this.doorOpenTrigger)
-		.trigger(this)
-		.then(() => this.log(`DEPRECATED: Trigger door change to: isDoorClosed=${didDoorJustClose}`))
-		.catch((err) => this.error(`DEPRECATED: Trigger door change failed: ${err}`));
+			.trigger(this)
+			.then(() => this.log(`DEPRECATED: Trigger door change to: isDoorClosed=${didDoorJustClose}`))
+			.catch((err) => this.error(`DEPRECATED: Trigger door change failed: ${err}`));
 
 	}
 }

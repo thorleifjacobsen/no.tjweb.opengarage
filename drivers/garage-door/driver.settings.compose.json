@@ -1,47 +1,175 @@
-[{
-  "type": "group",
-  "label": { "en": "General settings" },
-  "children": [
-    {
-      "id": "ip",
-      "type": "text",
-      "label": { "en": "IP Address" },
-      "value": ""
+[
+  {
+    "type": "group",
+    "label": {
+      "en": "General settings"
     },
-    {
-      "id": "port",
-      "type": "number",
-      "label": { "en": "Port" },
-      "value": 80,
-      "min": 1,
-      "max": 65543,
-      "hint": { "en": "Port used, default is 80." }
+    "children": [
+      {
+        "id": "ip",
+        "type": "text",
+        "label": {
+          "en": "IP Address"
+        },
+        "value": ""
+      },
+      {
+        "id": "port",
+        "type": "number",
+        "label": {
+          "en": "Port"
+        },
+        "value": 80,
+        "min": 1,
+        "max": 65543,
+        "hint": {
+          "en": "Port used, default is 80."
+        }
+      },
+      {
+        "id": "deviceKey",
+        "type": "text",
+        "label": {
+          "en": "Device Key"
+        },
+        "value": ""
+      },
+      {
+        "id": "openCloseTime",
+        "type": "number",
+        "label": {
+          "en": "Time for door to open or close:"
+        },
+        "hint": {
+          "en": "Number of seconds from you hear the relay click the button until the garage if fully opened or closed. This will trigger a update at this time. Use -1 to disable"
+        },
+        "value": 30,
+        "min": -1,
+        "max": 600,
+        "units": {
+          "en": "seconds"
+        }
+      },
+      {
+        "id": "pollingRate",
+        "type": "number",
+        "label": {
+          "en": "Polling Rate"
+        },
+        "value": 30,
+        "min": 30,
+        "max": 86400,
+        "hint": {
+          "en": "Number of seconds between each time Homey should fetch data from the OpenGarage device."
+        },
+        "units": {
+          "en": "seconds"
+        }
+      }
+    ]
+  },
+  {
+    "type": "group",
+    "label": {
+      "en": "Device settings"
     },
-    {
-      "id": "deviceKey",
-      "type": "text",
-      "label": { "en": "Device Key" },
-      "value": ""
-    },
-    {
-      "id": "openCloseTime",
-      "type": "number",
-      "label": { "en": "Time for door to open or close:" },
-      "hint": { "en": "Number of seconds from you click the button until the garage if fully opened or closed (use longest time function as value). This will trigger a update at this time and deny any button press while opening or closing. Use -1 to disable" },
-      "value": 30,
-      "min": -1,
-      "max": 600,
-      "units": { "en": "seconds" }
-    },
-    {
-      "id": "pollingRate",
-      "type": "number",
-      "label": { "en": "Polling Rate" },
-      "value": 30,
-      "min": 30,
-      "max": 86400,
-      "hint": { "en": "Number of seconds between each time Homey should fetch data from the OpenGarage device." },
-      "units": { "en": "seconds" }
-    }
-  ]
-}]
+    "children": [
+      {
+        "id": "dth",
+        "type": "number",
+        "label": {
+          "en": "Door Treshold"
+        },
+        "value": 60,
+        "min": 5,
+        "max": 1000,
+        "hint": {
+          "en": "Unit: cm, used to detect if door is open. Anything below given value is an open door."
+        },
+        "units": {
+          "en": "cm"
+        }
+      },
+      {
+        "id": "vth",
+        "type": "number",
+        "label": {
+          "en": "Vehicle Treshold"
+        },
+        "value": 200,
+        "min": 5,
+        "max": 1000,
+        "hint": {
+          "en": "Unit: cm, used to detect if vehicle is present. If door is open and value is lower than given value the vehicle state is set to present."
+        },
+        "units": {
+          "en": "cm"
+        }
+      },
+      {
+        "id": "cdt",
+        "type": "number",
+        "label": {
+          "en": "Click time"
+        },
+        "value": 1000,
+        "min": 100,
+        "max": 10000,
+        "hint": {
+          "en": "Unit: ms, used to set the time the relay should be active before releasing after getting a open / close command."
+        },
+        "units": {
+          "en": "ms"
+        }
+      },
+      {
+        "id": "dri",
+        "type": "number",
+        "label": {
+          "en": "Distance Reading Interval"
+        },
+        "value": 500,
+        "min": 500,
+        "max": 60000,
+        "hint": {
+          "en": "Number of milliseconds between each time the OpenGarage device should probe the distance. Changing this setting will update the OpenGarage device's settings aswell."
+        },
+        "units": {
+          "en": "ms"
+        }
+      },
+      {
+        "id": "alm",
+        "type": "dropdown",
+        "value": "1",
+        "label": { "en": "Alarm" },
+        "values": [
+          {
+            "id": "0",
+            "label": { "en": "No alarm" }
+          },
+          {
+            "id": "1",
+            "label": { "en": "5 second alarm" }
+          },
+          {
+            "id": "2",
+            "label": { "en": "10 second alarm" }
+          }
+        ],
+        "hint": {
+          "en": "How long the device should signal before opening the garage door. Changing this setting will update the OpenGarage device's settings aswell."
+        }
+      },
+      {
+        "id": "aoo",
+        "type": "checkbox",
+        "value": false,
+        "label": { "en": "Do not alarm when opening" },
+        "hint": {
+          "en": "If this is checked the device will not signal while opening. (Requires OpenGarage Firmware v1.1.2)"
+        }
+      }
+    ]
+  }
+]
