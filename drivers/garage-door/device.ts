@@ -12,11 +12,13 @@ class GarageDoorDevice extends Homey.Device {
 	private vehicleStateChangeTrigger!: Homey.FlowCardTriggerDevice;
 
 	private debounceActive: boolean = false;
-	private debounceTimer!: NodeJS.Timeout;
+
+	private pollTimer!: NodeJS.Timeout;
 
 	private lastData: OGState | undefined;
 
 	async onInit() {
+
 		/* Migration */
 		if (this.hasCapability('garagedoor_closed') === false) {
 			this.log(`Adding new garagedoor_closed capability to ${this.getName()}`);
@@ -28,48 +30,50 @@ class GarageDoorDevice extends Homey.Device {
 		};
 
 		/* Deprecation */
-		if (this.hasCapability('door_state')) { 
+		if (this.hasCapability('door_state')) {
 			this.log(`Removing old door_state capability from ${this.getName()}`);
 			await this.removeCapability('door_state');
 		}
 
-		
+
 		/* Triggers */
-		this.doorOpenTrigger           = this.homey.flow.getDeviceTriggerCard('door_open');
-		this.doorCloseTrigger          = this.homey.flow.getDeviceTriggerCard('door_close');
+		this.doorOpenTrigger = this.homey.flow.getDeviceTriggerCard('door_open');
+		this.doorCloseTrigger = this.homey.flow.getDeviceTriggerCard('door_close');
 		this.vehicleStateChangeTrigger = this.homey.flow.getDeviceTriggerCard('vehicle_state_change');
 
 		/* Actions */
-		this.homey.flow.getActionCard('door_close').registerRunListener(async (args) => {
-			let device: GarageDoorDevice = args.device;
-			device.sendDoorCommand(OGCommand.close);
-		});
+		this.homey.flow.getActionCard('door_close')
+			.registerRunListener(async ({ device }: { device: GarageDoorDevice }) => {
+				device.sendDoorCommand(OGCommand.close);
+			});
 
-		this.homey.flow.getActionCard('door_open').registerRunListener(async (args) => {
-			let device: GarageDoorDevice = args.device;
-			device.sendDoorCommand(OGCommand.open);
-		});
+		this.homey.flow.getActionCard('door_open')
+			.registerRunListener(async ({ device }: { device: GarageDoorDevice }) => {
+				device.sendDoorCommand(OGCommand.open);
+			});
 
 		/* Conditions */
-		this.homey.flow.getConditionCard('is_open').registerRunListener(async (args) => {
-			let device: GarageDoorDevice = args.device;
-			return ! device.getCapabilityValue("garagedoor_closed");
-		});
+		this.homey.flow.getConditionCard('is_open')
+			.registerRunListener(async ({ device }: { device: GarageDoorDevice }) => {
+				return !device.getCapabilityValue("garagedoor_closed");
+			});
 
-		this.homey.flow.getConditionCard('vehicle_is_present').registerRunListener((args) => {
-			return args.device.getCapabilityValue("vehicle_state") == '1'
-		});
+		this.homey.flow.getConditionCard('vehicle_is_present')
+			.registerRunListener(({ device }: { device: GarageDoorDevice }) => {
+				return device.getCapabilityValue("vehicle_state") == '1'
+			});
 
-		this.homey.flow.getConditionCard('height_is').registerRunListener(async (args) => {
-			return args.device.getCapabilityValue("measure_distance") > args.height;
-		});
+		this.homey.flow.getConditionCard('height_is')
+			.registerRunListener(async ({ height, device }: { height: number, device: GarageDoorDevice }) => {
+				return device.getCapabilityValue("measure_distance") > height;
+			});
 
 		/* Capabilities */
-		this.registerCapabilityListener('garagedoor_closed', this.doorStateChange.bind(this))
+		this.registerCapabilityListener('garagedoor_closed', this.changeDoorState.bind(this))
 
 		/* Start polling data */
 		this.log(`Starting timer for device: ${this.getName()}`)
-		this.pollData()
+		this.pollTimer = setTimeout(() => { this.pollData() }, this.getSetting('pollingRate') * 1000);
 
 	}
 
@@ -79,55 +83,66 @@ class GarageDoorDevice extends Homey.Device {
 		return `http://${settings.ip}:${settings.port}/${path}`
 	}
 
-	async sendDoorCommand(command: OGCommand) {
+	sendDoorCommand(command: OGCommand): Promise<void> {
 
 		this.log(`Sending door command ${command} for ${this.getName()}`)
 
-		try {
+		return new Promise(async (resolve, reject) => {
+			try {
+				const endpoint = this.createEndpoint(`cc?dkey=${this.getSetting('deviceKey')}&${command}=1`);
+				const res = await axios.get(endpoint);
+				const response: OGResponse = res.data;
 
-			const endpoint = this.createEndpoint(`cc?dkey=${this.getSetting('deviceKey')}&${command}=1`)
-			const res = await axios.get(endpoint);
-			const response: OGResponse = res.data;
+				if (response.result == 1) {
 
-			if (response.result == 1) {
+					// Stop the poll timer, we know something is moving and we can wait 
+					// until the openCloseTime to poll again.
+					clearTimeout(this.pollTimer);
+					this.pollTimer = setTimeout(() => { this.pollData() }, this.getSetting('openCloseTime') * 1000);
 
-				setTimeout(() => { this.pollData(true) }, this.getSetting('openCloseTime') * 1000)
-				return Promise.resolve()
+					// Done!
+					resolve()
+				} else {
+
+					reject(response.result)
+				}
+			} catch (error) {
+
+				reject(error)
+			}
+		})
+	}
+
+	changeDoorState(toClosed: boolean): Promise<void> {
+
+		return new Promise(async (resolve, reject) => {
+
+			if (this.debounceActive) {
+				if (this.lastData) {
+					this.setCapabilityValue("garagedoor_closed", this.lastData.door == 0);
+				}
+				reject(this.homey.__("errors.debounce"));
 			} else {
+				try {
 
-				return Promise.reject(response.result)
+					// Send door command
+					await this.sendDoorCommand(toClosed ? OGCommand.close : OGCommand.open);
+
+					// Activate debounce
+					this.debounceActive = true;
+					setTimeout(() => { this.debounceActive = false; }, 5000);
+
+					// Resolve
+					resolve();
+				} catch (error) {
+					reject(this.homey.__("errors.error_when_changing_door_state", { error }));
+				}
 			}
-		} catch (error) {
-
-			return Promise.reject(error)
-		}
+		})
 
 	}
 
-	async doorStateChange(toClosed: boolean) {
-
-		if (this.debounceActive) {
-			if (this.lastData) { 
-				this.setCapabilityValue("garagedoor_closed", this.lastData.door == 0)
-			}
-			throw new Error(this.homey.__("errors.debounce"));
-		} else {
-			this.debounceActive = true;
-			clearTimeout(this.debounceTimer)
-			this.debounceTimer = setTimeout(() => { this.debounceActive = false; }, 5000)
-		}
-
-		try {
-			await this.sendDoorCommand(toClosed ? OGCommand.close : OGCommand.open)
-			return Promise.resolve();
-		} catch (error) {
-			throw new Error(this.homey.__("errors.unknown", { error }))
-		}
-
-
-	}
-
-	pollData(onlyOnce: boolean = false): void {
+	pollData(): void {
 
 		axios.get(this.createEndpoint('jc'))
 			.then(response => {
@@ -138,10 +153,8 @@ class GarageDoorDevice extends Homey.Device {
 				this.log(`Error polling data from device ${this.getName()}. Error given: ${error.code} (${error.errno})`);
 				this.setUnavailable(this.homey.__("errors.polling", { error: error.code }));
 			})
-			.then(() => {
-				if (onlyOnce != true) {
-					setTimeout(() => { this.pollData() }, this.getSetting('pollingRate') * 1000);
-				}
+			.finally(() => {
+				this.pollTimer = setTimeout(() => { this.pollData() }, this.getSetting('pollingRate') * 1000);
 			})
 
 		//this.log("Polling data, current pollingrate is set to:", this.getSetting('pollingRate'))
