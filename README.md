@@ -49,6 +49,7 @@ When adding a OpenGarage device to your Homey you need to enter the IP address, 
 ```
 npm install
 sudo npm install --global --no-optional homey
+touch app.json
 homey app add-types
 homey login
 homey app install
