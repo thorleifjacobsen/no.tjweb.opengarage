@@ -29,6 +29,8 @@ When adding a OpenGarage device to your Homey you need to enter the IP address, 
 - 1.1.1
     - Updated to use new garage door capability. All old flows should still work but I recommend you to replace all cards referencing garage door with the new ones. 
     - Fixed the trigger "Vehicle state change" which never worked.
+    - Added new settings which syncronizes with OpenGarage settings (to adjust door status measurement, vehicle measurement, alarm time e.t.c.)
+    - Adjusted timings for when to poll status based on status updates + alarm time + given door opening time.
     - Cleaned up and published repo to github
     - Converted project to typescript
 - 1.0.2
