@@ -58,7 +58,7 @@ homey app install
 ## Running the emulator
 
 ```
-npx ts-node OpenGarageEmulator/app.ts
+npm run emulator
 ```
 
 Default port: 1987
