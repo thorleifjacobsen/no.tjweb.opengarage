@@ -123,6 +123,9 @@ class GarageDoorDevice extends Homey.Device {
 					this.debounceActive = true;
 					setTimeout(() => { this.debounceActive = false; }, 1000);
 
+					// DEPRECATED: Also trigger deprecrated flows
+					this.triggerDeprecatedOpenCloseFlow(toClosed);
+
 					// Resolve
 					resolve();
 				} catch (error) {
@@ -135,7 +138,7 @@ class GarageDoorDevice extends Homey.Device {
 
 	pollData(): void {
 
-		if (this.isPolling) return; 
+		if (this.isPolling) return;
 		this.isPolling = true;
 
 		axios.get(this.createEndpoint('jc'))
@@ -158,11 +161,13 @@ class GarageDoorDevice extends Homey.Device {
 		/* Update lastData */
 		const isDoorClosed = data.door == 0;
 
-		/* Check if changed, if so call trigger something */
+		/* This should only be differnt if changed by external means. */
 		if (this.getCapabilityValue("garagedoor_closed") != isDoorClosed) {
-			if (isDoorClosed) { this.doorCloseTrigger?.trigger(this).catch(this.error).then(() => this.log("Trigger close door")) }
-			else { this.doorOpenTrigger?.trigger(this).catch(this.error).then(() => this.log("Trigger open door")) }
-			this.setCapabilityValue("garagedoor_closed", isDoorClosed)
+			/* It has changed! Lets update the state of garagedoor_closed */
+			this.setCapabilityValue("garagedoor_closed", isDoorClosed);
+
+			// DEPRECATED: Also trigger deprecrated flows
+			this.triggerDeprecatedOpenCloseFlow(isDoorClosed);
 		}
 
 		if (this.getCapabilityValue("measure_distance") != data.dist)
@@ -170,11 +175,25 @@ class GarageDoorDevice extends Homey.Device {
 
 		if (this.getCapabilityValue("vehicle_state") != data.vehicle.toString()) {
 			this.setCapabilityValue("vehicle_state", data.vehicle.toString())
-			this.carStateChangeTrigger.trigger(this).catch(this.error).then(() => this.log("Trigger vehicle change"))
+			this.carStateChangeTrigger
+				.trigger(this)
+				.then(() => this.log("Trigger vehicle change"))
+				.catch((err) => this.error(`Trigger vehicle change failed: ${err}`))
 		}
 
 		if (this.getCapabilityValue("measure_rssi") != data.rssi)
 			this.setCapabilityValue("measure_rssi", data.rssi)
+	}
+
+	// This is just to keep backwards compability.
+	triggerDeprecatedOpenCloseFlow(didDoorJustClose: boolean) {
+		
+		// DEPRECATED: Also trigger deprecrated flows
+		(didDoorJustClose ? this.doorCloseTrigger : this.doorOpenTrigger)
+		.trigger(this)
+		.then(() => this.log(`DEPRECATED: Trigger door change to: isDoorClosed=${didDoorJustClose}`))
+		.catch((err) => this.error(`DEPRECATED: Trigger door change failed: ${err}`));
+
 	}
 }
 
