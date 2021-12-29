@@ -139,22 +139,6 @@
         }
       },
       {
-        "id": "dri",
-        "type": "number",
-        "label": {
-          "en": "Distance Reading Interval"
-        },
-        "value": 500,
-        "min": 500,
-        "max": 60000,
-        "hint": {
-          "en": "Number of milliseconds between each time the OpenGarage device should probe the distance. Changing this setting will update the OpenGarage device's settings aswell."
-        },
-        "units": {
-          "en": "ms"
-        }
-      },
-      {
         "id": "alm",
         "type": "dropdown",
         "value": "1",

@@ -83,7 +83,6 @@ class GarageDoorDevice extends Homey.Device {
 		if(changedKeys.includes("dth") && newSettings.dth) queryParam += "&dth="+newSettings.dth;
 		if(changedKeys.includes("vth") && newSettings.vth) queryParam += "&vth="+newSettings.vth;
 		if(changedKeys.includes("cdt") && newSettings.cdt) queryParam += "&cdt="+newSettings.cdt;
-		if(changedKeys.includes("dri") && newSettings.dri) queryParam += "&dri="+newSettings.dri;
 		if(changedKeys.includes("alm") && newSettings.alm) queryParam += "&alm="+newSettings.alm;
 		if(changedKeys.includes("aoo") && newSettings.aoo) queryParam += "&aoo="+(+newSettings.aoo);
 		
@@ -258,16 +257,15 @@ class GarageDoorDevice extends Homey.Device {
 				dth: deviceOptions.dth,
 				vth: deviceOptions.vth,
 				cdt: deviceOptions.cdt,
-				dri: deviceOptions.dri,
 				alm: deviceOptions.alm?.toString() || "0", /* Convert to string and if not set default to 0 */
 				aoo: !!deviceOptions.aoo /* Convert to true / false */
 			}
 			
 			this.setSettings(deviceSettings);
 			
-		} catch(error) {
+		} catch(error: any) {
 
-			this.error("Error occured when updating options", error)
+			this.error(`Error occured when updating options. Error given: ${error.code} (${error.errno})`)
 		}
 	}
 

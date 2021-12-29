@@ -32,7 +32,6 @@ export interface OGSettings extends Object {
 	dth?: number;
 	vth?: number;
 	cdt?: number;
-	dri?: number;
 	alm?: string;
 	aoo?: boolean;
 }
