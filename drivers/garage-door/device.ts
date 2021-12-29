@@ -76,15 +76,15 @@ class GarageDoorDevice extends Homey.Device {
 		this.pollData();
 	}
 
-	async onSettings({ newSettings, changedKeys }: { newSettings: OGSettings, changedKeys: Array<string> }) {
+	async onSettings({ newSettings }: { newSettings: OGSettings }) {
 		let queryParam = "";
 
-		if(changedKeys.includes("riv") && newSettings.riv) queryParam += "&riv="+newSettings.riv;
-		if(changedKeys.includes("dth") && newSettings.dth) queryParam += "&dth="+newSettings.dth;
-		if(changedKeys.includes("vth") && newSettings.vth) queryParam += "&vth="+newSettings.vth;
-		if(changedKeys.includes("cdt") && newSettings.cdt) queryParam += "&cdt="+newSettings.cdt;
-		if(changedKeys.includes("alm") && newSettings.alm) queryParam += "&alm="+newSettings.alm;
-		if(changedKeys.includes("aoo") && newSettings.aoo) queryParam += "&aoo="+(+newSettings.aoo);
+		if(newSettings.riv) queryParam += "&riv="+newSettings.riv;
+		if(newSettings.dth) queryParam += "&dth="+newSettings.dth;
+		if(newSettings.vth) queryParam += "&vth="+newSettings.vth;
+		if(newSettings.cdt) queryParam += "&cdt="+newSettings.cdt;
+		if(newSettings.alm) queryParam += "&alm="+newSettings.alm;
+		if(newSettings.aoo) queryParam += "&aoo="+(+newSettings.aoo); /* Convert true/false to 1/0 */
 		
 		if (queryParam.length > 0) {
 
