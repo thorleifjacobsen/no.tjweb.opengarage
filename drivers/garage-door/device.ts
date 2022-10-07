@@ -1,13 +1,13 @@
 
 import axios from 'axios';
-import Homey, { FlowCardAction, FlowCardCondition, FlowCardTrigger, FlowCardTriggerDevice } from 'homey';
+import * as Homey from 'homey';
 import { OGState, OGCommand, OGResponse } from './definations';
 
 class GarageDoorDevice extends Homey.Device {
 
-	private doorOpenTrigger!: FlowCardTriggerDevice;
-	private doorCloseTrigger!: FlowCardTriggerDevice;
-	private vehicleStateChangeTrigger!: FlowCardTriggerDevice;
+	private doorOpenTrigger!: Homey.FlowCardTriggerDevice;
+	private doorCloseTrigger!: Homey.FlowCardTriggerDevice;
+	private vehicleStateChangeTrigger!: Homey.FlowCardTriggerDevice;
 
 	private debounceActive: boolean = false;
 	private debounceTimer!: NodeJS.Timeout;
@@ -32,8 +32,6 @@ class GarageDoorDevice extends Homey.Device {
 			this.log(`Removing old door_state capability from ${this.getName()}`);
 			await this.removeCapability('door_state');
 		}
-
-		
 		
 		this.doorOpenTrigger = this.homey.flow.getDeviceTriggerCard('door_open');
 		this.doorCloseTrigger = this.homey.flow.getDeviceTriggerCard('door_close');

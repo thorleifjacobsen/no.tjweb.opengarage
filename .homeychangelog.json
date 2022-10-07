@@ -10,5 +10,8 @@
   },
   "1.1.0": {
     "en": "Updated to use new garage door. To use this you need to re-add the old ones."
+  },
+  "1.1.1": {
+    "en": "Updated to use new garage door. Auto migration, some deprecrated functions and code cleanup"
   }
 }
