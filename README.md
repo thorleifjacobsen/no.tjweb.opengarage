@@ -26,6 +26,9 @@ When adding a OpenGarage device to your Homey you need to enter the IP address, 
  
 ## Changelog
 
+- 1.1.2
+    - **In progress:** Bug where it would announce open then closed again after closing
+    - **In progress:** Verify that vehicle state change works. Seems a bit flakey still
 - 1.1.1
     - Updated to use new garage door capability. All old flows should still work but I recommend you to replace all cards referencing garage door with the new ones. 
     - Fixed the trigger "Vehicle state change" which never worked.
@@ -43,6 +46,7 @@ When adding a OpenGarage device to your Homey you need to enter the IP address, 
 ## Links
 
 [OpenGarage](https://opengarage.io/)
+[App on Homey](https://homey.app/en-us/app/no.tjweb.opengarage/OpenGarage/)
 
 ## Manual installation (Not for newbs)
 
