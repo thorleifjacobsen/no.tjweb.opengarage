@@ -46,13 +46,16 @@ class GarageDoorDevice extends Homey.Device {
 			await this.removeCapability('door_state');
 		}
 
-		/* Define cards */
+		/* Define the deprecated cards */
 		this.doorOpenTrigger = this.homey.flow.getDeviceTriggerCard('door_open');
 		this.doorCloseTrigger = this.homey.flow.getDeviceTriggerCard('door_close');
-		this.carStateChangeTrigger = this.homey.flow.getDeviceTriggerCard('vehicle_state_change');
 		this.doorCloseAction = this.homey.flow.getActionCard('door_close');
 		this.doorOpenAction = this.homey.flow.getActionCard('door_open');
 		this.isOpenCondition = this.homey.flow.getConditionCard('is_open');
+
+
+		/* Define cards */
+		this.carStateChangeTrigger = this.homey.flow.getDeviceTriggerCard('vehicle_state_change');
 		this.carIsPresentCondition = this.homey.flow.getConditionCard('vehicle_is_present');
 		this.heightIsCondition = this.homey.flow.getConditionCard('height_is');
 
@@ -165,13 +168,14 @@ class GarageDoorDevice extends Homey.Device {
 				reject(this.homey.__("errors.debounce"));
 			} else {
 				try {
+					
+					// Activate debounce
+					this.debounceActive = true;
+					setTimeout(() => { this.debounceActive = false; }, 1000);
 
 					// Send door command
 					await this.sendDoorCommand(toClosed ? OGCommand.close : OGCommand.open);
 
-					// Activate debounce
-					this.debounceActive = true;
-					setTimeout(() => { this.debounceActive = false; }, 1000);
 
 					// DEPRECATED: Also trigger deprecrated flows
 					this.triggerDeprecatedOpenCloseFlow(toClosed);
