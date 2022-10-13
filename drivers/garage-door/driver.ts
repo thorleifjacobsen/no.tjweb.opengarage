@@ -1,4 +1,4 @@
-import Homey from 'homey';
+import * as Homey from 'homey';
 import axios from 'axios';
 import { OGResponse, OGState } from './definations';
 

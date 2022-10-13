@@ -8,7 +8,10 @@
   "1.0.2": {
     "en": "Bug which fixed problem when you had more than 1 door."
   },
+  "1.1.0": {
+    "en": "Updated to use new garage door. To use this you need to re-add the old ones."
+  },
   "1.1.1": {
-    "en": "Updated to use new garage door capability. All old flows should still work but I recommend you to replace all cards referencing garage door with the new ones. Also fixed the trigger for vechicle state change which never triggered before and added the possibility to change settings on the device from homey. And added updates to how it polls status based on alarm time, status check time and the time it takes for the door to close / open given by the user in the settings."
+    "en": "Updated to use new garage door. Auto migration, some deprecrated functions and code cleanup"
   }
 }
