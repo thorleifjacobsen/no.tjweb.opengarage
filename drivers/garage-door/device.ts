@@ -14,8 +14,6 @@ class GarageDoorDevice extends Homey.Device {
 
 	private pollTimeout!: NodeJS.Timeout;
 
-	private lastData: OGState | undefined;
-
 	async onInit() {
 		// Init flows
 
@@ -62,8 +60,6 @@ class GarageDoorDevice extends Homey.Device {
 		this.homey.flow.getConditionCard('height_is').registerRunListener(async (args) => {
 			return args.device.getCapabilityValue("measure_distance") > args.height;
 		});
-
-		// Debounce
 
 		// Init capabiltiies
 		this.registerCapabilityListener('garagedoor_closed', this.doorStateChange.bind(this))
@@ -154,8 +150,7 @@ class GarageDoorDevice extends Homey.Device {
 
 	parseData(data: OGState) {
 
-		// Update lastData
-		this.lastData = data
+		// Create a variable for oor state
 		const isDoorClosed = data.door == 0;
 
 		// Proof vehicle state
@@ -164,8 +159,8 @@ class GarageDoorDevice extends Homey.Device {
 
 		// Check if changed, if so call trigger something
 		if (this.getCapabilityValue("garagedoor_closed") != isDoorClosed) {
-			/* Deprecated */  if (isDoorClosed) { this.doorCloseTrigger?.trigger(this).catch(this.error).then(() => this.log("Trigger close door")) }
-			/* Deprecated */  else { this.doorOpenTrigger?.trigger(this).catch(this.error).then(() => this.log("Trigger open door")) }
+			/* Deprecated */  if (isDoorClosed) { this.doorCloseTrigger?.trigger(this).catch(this.error).finally(() => this.log("Trigger close door")) }
+			/* Deprecated */  else { this.doorOpenTrigger?.trigger(this).catch(this.error).finally(() => this.log("Trigger open door")) }
 			this.setCapabilityValue("garagedoor_closed", isDoorClosed)
 		}
 
