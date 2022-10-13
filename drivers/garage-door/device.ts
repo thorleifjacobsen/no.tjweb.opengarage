@@ -91,7 +91,13 @@ class GarageDoorDevice extends Homey.Device {
 			if (response.result == 1) {
 				// TODO: See if this is nessesary?
 				//if (this.lastData) this.setCapabilityValue("door_state", this.lastData.door == 1 ? 'up' : 'down')
-				setTimeout(() => { this.pollData(true) }, this.getSetting('openCloseTime') * 1000)
+
+				let doorTime = this.getSetting('openCloseTime');
+				
+				if(this.getSetting('alm') == 2) doorTime += 10;
+				if(this.getSetting('alm') == 1) doorTime += 5;
+
+				setTimeout(() => { this.pollData(true) }, doorTime * 1000)
 				return Promise.resolve()
 			} else {
 
@@ -107,9 +113,6 @@ class GarageDoorDevice extends Homey.Device {
 	async doorStateChange(toClosed: boolean) {
 
 		if (this.debounceActive) {
-			if (this.lastData) { 
-				this.setCapabilityValue("garagedoor_closed", this.lastData.door == 0)
-			}
 			throw new Error(this.homey.__("errors.debounce"));
 		} else {
 			this.debounceActive = true;
