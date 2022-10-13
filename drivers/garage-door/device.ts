@@ -153,6 +153,10 @@ class GarageDoorDevice extends Homey.Device {
 		this.lastData = data
 		const isDoorClosed = data.door == 0;
 
+		// Proof vehicle state
+		if(data.vehicle > 1) data.vehicle = 2;
+		if(data.vehicle < 1) data.vehicle = 0;
+
 		// Check if changed, if so call trigger something
 		if (this.getCapabilityValue("garagedoor_closed") != isDoorClosed) {
 			if (isDoorClosed) { this.doorCloseTrigger?.trigger(this).catch(this.error).then(() => this.log("Trigger close door")) }
