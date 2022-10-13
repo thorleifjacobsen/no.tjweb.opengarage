@@ -12,6 +12,8 @@ class GarageDoorDevice extends Homey.Device {
 	private debounceActive: boolean = false;
 	private debounceTimer!: NodeJS.Timeout;
 
+	private pollTimeout!: NodeJS.Timeout;
+
 	private lastData: OGState | undefined;
 
 	async onInit() {
@@ -33,22 +35,22 @@ class GarageDoorDevice extends Homey.Device {
 			await this.removeCapability('door_state');
 		}
 		
-		this.doorOpenTrigger = this.homey.flow.getDeviceTriggerCard('door_open');
-		this.doorCloseTrigger = this.homey.flow.getDeviceTriggerCard('door_close');
+		/* Deprecated */ this.doorOpenTrigger = this.homey.flow.getDeviceTriggerCard('door_open');
+		/* Deprecated */ this.doorCloseTrigger = this.homey.flow.getDeviceTriggerCard('door_close');
 
 		this.vehicleStateChangeTrigger = this.homey.flow.getDeviceTriggerCard('vehicle_state_change');
 
-		this.homey.flow.getActionCard('door_close').registerRunListener(async (args) => {
+		/* Deprecated */  this.homey.flow.getActionCard('door_close').registerRunListener(async (args) => {
 			let device: GarageDoorDevice = args.device;
 			device.sendDoorCommand(OGCommand.close);
 		});
 
-		this.homey.flow.getActionCard('door_open').registerRunListener(async (args) => {
+		/* Deprecated */  this.homey.flow.getActionCard('door_open').registerRunListener(async (args) => {
 			let device: GarageDoorDevice = args.device;
 			device.sendDoorCommand(OGCommand.open);
 		});
 
-		this.homey.flow.getConditionCard('is_open').registerRunListener(async (args) => {
+		/* Deprecated */  this.homey.flow.getConditionCard('is_open').registerRunListener(async (args) => {
 			let device: GarageDoorDevice = args.device;
 			return ! device.getCapabilityValue("garagedoor_closed");
 		});
@@ -89,22 +91,20 @@ class GarageDoorDevice extends Homey.Device {
 			const response: OGResponse = res.data;
 
 			if (response.result == 1) {
-				// TODO: See if this is nessesary?
-				//if (this.lastData) this.setCapabilityValue("door_state", this.lastData.door == 1 ? 'up' : 'down')
 
 				let doorTime = this.getSetting('openCloseTime');
 				
 				if(this.getSetting('alm') == 2) doorTime += 10;
 				if(this.getSetting('alm') == 1) doorTime += 5;
 
-				setTimeout(() => { this.pollData(true) }, doorTime * 1000)
+				this.pollTimeout = setTimeout(() => { this.pollData() }, doorTime * 1000)
 				return Promise.resolve()
 			} else {
 
 				return Promise.reject(response.result)
 			}
 		} catch (error) {
-
+			
 			return Promise.reject(error)
 		}
 
@@ -121,9 +121,11 @@ class GarageDoorDevice extends Homey.Device {
 		}
 
 		try {
+			clearTimeout(this.pollTimeout);
 			await this.sendDoorCommand(toClosed ? OGCommand.close : OGCommand.open)
 			return Promise.resolve();
 		} catch (error) {
+			this.pollData();
 			throw new Error(this.homey.__("errors.unknown", { error }))
 		}
 
@@ -141,9 +143,9 @@ class GarageDoorDevice extends Homey.Device {
 				this.log(`Error polling data from device ${this.getName()}. Error given: ${error.code} (${error.errno})`);
 				this.setUnavailable(this.homey.__("errors.polling", { error: error.code }));
 			})
-			.then(() => {
+			.finally(() => {
 				if (onlyOnce != true) {
-					setTimeout(() => { this.pollData() }, this.getSetting('pollingRate') * 1000);
+					this.pollTimeout = setTimeout(() => { this.pollData() }, this.getSetting('pollingRate') * 1000);
 				}
 			})
 
@@ -162,8 +164,8 @@ class GarageDoorDevice extends Homey.Device {
 
 		// Check if changed, if so call trigger something
 		if (this.getCapabilityValue("garagedoor_closed") != isDoorClosed) {
-			if (isDoorClosed) { this.doorCloseTrigger?.trigger(this).catch(this.error).then(() => this.log("Trigger close door")) }
-			else { this.doorOpenTrigger?.trigger(this).catch(this.error).then(() => this.log("Trigger open door")) }
+			/* Deprecated */  if (isDoorClosed) { this.doorCloseTrigger?.trigger(this).catch(this.error).then(() => this.log("Trigger close door")) }
+			/* Deprecated */  else { this.doorOpenTrigger?.trigger(this).catch(this.error).then(() => this.log("Trigger open door")) }
 			this.setCapabilityValue("garagedoor_closed", isDoorClosed)
 		}
 
