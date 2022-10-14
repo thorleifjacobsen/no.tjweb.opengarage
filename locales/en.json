@@ -7,6 +7,9 @@
     "wrong_devicekey": "Device key not accepted!",
     "error_when_trying_key": "Unknown error when trying device key!",
     "unexpected_response": "Unexpected response got from device! Make sure this is a OpenGarage device and the details given are correct.",
-    "connecting": "Unknown error when trying to connect to device."
+    "connecting": "Unknown error when trying to connect to device.",
+    "error_saving_config": "Unknown error when trying to save config to device.",
+    "error_get_config": "Unknown error when trying to get config to device.",
+    "wrong_response": "Wrong response. Response given: __response__"
   }
 }

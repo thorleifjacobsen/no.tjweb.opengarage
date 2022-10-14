@@ -164,7 +164,7 @@
       {
         "id": "aoo",
         "type": "checkbox",
-        "value": false,
+        "value": true,
         "label": { "en": "Alarm on opening" },
         "hint": {
           "en": "If this is checked the device will signal while opening. If not it will open instantly. (Requires OpenGarage Firmware v1.1.2)"
