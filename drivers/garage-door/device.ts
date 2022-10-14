@@ -154,8 +154,10 @@ class GarageDoorDevice extends Homey.Device {
 		if (this.getCapabilityValue("measure_distance") != data.dist)
 			this.setCapabilityValue("measure_distance", data.dist);
 
-		if (this.getCapabilityValue("vehicle_state") != data.vehicle.toString())
+		if (this.getCapabilityValue("vehicle_state") != data.vehicle.toString()) {
 			this.setCapabilityValue("vehicle_state", data.vehicle.toString());
+			this.vehicleStateChangeTrigger.trigger(this);
+		}
 
 		if (this.getCapabilityValue("measure_rssi") != data.rssi)
 			this.setCapabilityValue("measure_rssi", data.rssi);
