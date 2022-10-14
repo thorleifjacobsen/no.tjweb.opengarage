@@ -88,12 +88,19 @@ class GarageDoorDevice extends Homey.Device {
 
 			if (response.result == 1) {
 
-				let doorTime = this.getSetting('openCloseTime');
+				// calculate maximum time for door to be opened and registered as open by OpenGarage
+				// First the time it takes to open/close it
+				let doorOpenCloseTotalTime = this.getSetting('openCloseTime'); 
 				
-				if(this.getSetting('alm') == 2) doorTime += 10;
-				if(this.getSetting('alm') == 1) doorTime += 5;
+				// Then add the alarm time
+				if(this.getSetting('alm') == 2) doorOpenCloseTotalTime += 10; 
+				if(this.getSetting('alm') == 1) doorOpenCloseTotalTime += 5;
+				
+				// Then add the time it takes between each reads +1 sec for safe keeping.
+				doorOpenCloseTotalTime += parseInt(this.getSetting('riv')) + 1;
 
-				this.pollTimeout = setTimeout(() => { this.pollData() }, doorTime * 1000)
+				// Now we should have the maximum time it should take to close / open and read from distance sensor.
+				this.pollTimeout = setTimeout(() => { this.pollData() }, doorOpenCloseTotalTime * 1000)
 				return Promise.resolve()
 			} else {
 
