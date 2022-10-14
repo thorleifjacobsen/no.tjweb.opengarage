@@ -39,29 +39,6 @@ class GarageDoorDevice extends Homey.Device {
 
 		this.vehicleStateChangeTrigger = this.homey.flow.getDeviceTriggerCard('vehicle_state_change');
 
-		/* Deprecated */  this.homey.flow.getActionCard('door_close').registerRunListener(async (args) => {
-			let device: GarageDoorDevice = args.device;
-			device.sendDoorCommand(OGCommand.close);
-		});
-
-		/* Deprecated */  this.homey.flow.getActionCard('door_open').registerRunListener(async (args) => {
-			let device: GarageDoorDevice = args.device;
-			device.sendDoorCommand(OGCommand.open);
-		});
-
-		/* Deprecated */  this.homey.flow.getConditionCard('is_open').registerRunListener(async (args) => {
-			let device: GarageDoorDevice = args.device;
-			return !device.getCapabilityValue("garagedoor_closed");
-		});
-
-		this.homey.flow.getConditionCard('vehicle_is_present').registerRunListener((args) => {
-			return args.device.getCapabilityValue("vehicle_state") == '1'
-		});
-
-		this.homey.flow.getConditionCard('height_is').registerRunListener(async (args) => {
-			return args.device.getCapabilityValue("measure_distance") > args.height;
-		});
-
 		// Init capabiltiies
 		this.registerCapabilityListener('garagedoor_closed', this.doorStateChange.bind(this));
 

@@ -1,6 +1,6 @@
 import * as Homey from 'homey';
 import axios from 'axios';
-import { OGResponse, OGState } from './definations';
+import { OGResponse, OGState, OGCommand } from './definations';
 
 
 class GarageDoorDriver extends Homey.Driver {
@@ -28,6 +28,28 @@ class GarageDoorDriver extends Homey.Driver {
 					"**Actions:** Open/Close garage door\n\n"
 			});
 		}
+
+
+		/* Deprecated */  this.homey.flow.getActionCard('door_close').registerRunListener(async (args) => {
+			args.device.sendDoorCommand(OGCommand.close);
+		});
+
+		/* Deprecated */  this.homey.flow.getActionCard('door_open').registerRunListener(async (args) => {
+			args.device.sendDoorCommand(OGCommand.open);
+		});
+
+		/* Deprecated */  this.homey.flow.getConditionCard('is_open').registerRunListener(async (args) => {
+			return !args.device.getCapabilityValue("garagedoor_closed");
+		});
+
+		this.homey.flow.getConditionCard('vehicle_is_present').registerRunListener((args) => {
+			return args.device.getCapabilityValue("vehicle_state") == '1'
+		});
+
+		this.homey.flow.getConditionCard('height_is').registerRunListener(async (args) => {
+			return args.device.getCapabilityValue("measure_distance") > args.height;
+		});
+		
 	}
 
 
