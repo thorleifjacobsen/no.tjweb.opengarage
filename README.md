@@ -27,7 +27,8 @@ When adding a OpenGarage device to your Homey you need to enter the IP address, 
 ## Changelog
 
 - 1.1.2
-    - **In progress:** Bug where it would announce open then closed again after closing
+    - Lowered minimum poll rate, your choice if ur network is good enough.
+    - Fixed: Bug where it would announce closed, open and closed.
     - Vehicle state change now works. Sorry guys!
     - Fixed so settings syncronizes. They update on restart but pushes on every save.
 - 1.1.1

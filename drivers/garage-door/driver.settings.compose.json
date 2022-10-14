@@ -41,10 +41,10 @@
           "en": "Time for door to open or close:"
         },
         "hint": {
-          "en": "Number of seconds from you hear the relay click the button until the garage if fully opened or closed. This will trigger a update at this time. Use -1 to disable"
+          "en": "Number of seconds from you hear the relay click the button until the garage if fully opened or closed. This will trigger a update at this time. Use 0 to disable"
         },
         "value": 30,
-        "min": -1,
+        "min": 0,
         "max": 600,
         "units": {
           "en": "seconds"
@@ -56,7 +56,7 @@
         "label": {
           "en": "Polling Rate"
         },
-        "value": 30,
+        "value": 5,
         "min": 30,
         "max": 86400,
         "hint": {
