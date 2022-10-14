@@ -38,7 +38,7 @@
         "id": "openCloseTime",
         "type": "number",
         "label": {
-          "en": "Time for door to open or close:"
+          "en": "Time for door movement:"
         },
         "hint": {
           "en": "Number of seconds from you hear the relay click the button until the garage if fully opened or closed. This will trigger a update at this time. Use 0 to disable"

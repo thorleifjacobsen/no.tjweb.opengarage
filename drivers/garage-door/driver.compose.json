@@ -8,7 +8,7 @@
   "capabilitiesOptions": {
     "garagedoor_closed": {
       "insightsTitleTrue": { "en": "Closed" },
-      "insightsTitleFalse": { "en": "Opened" }
+      "insightsTitleFalse": { "en": "Open" }
     }
   },
   "pair": [
