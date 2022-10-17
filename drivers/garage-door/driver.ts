@@ -70,7 +70,7 @@ class GarageDoorDriver extends Homey.Driver {
 
 				if (state.fwv && state.name) {
 
-					this.log("Found OpenGarage '" + state.name + "' firmware version: " + state.fwv)
+					this.log(`Found OpenGarage ${state.name} firmware version: ${state.fwv}`)
 
 					response = await axios.get(deviceControlUrl);
 					const deviceControl: OGResponse = response.data

@@ -227,6 +227,16 @@ class GarageDoorDevice extends Homey.Device {
 		Promise.resolve("Settings saved");
 	}
 
+	async onDeleted(): Promise<string | void> {
+		try {
+			this.log(`Deleted device ${this.getName()} - Clearing timeouts if any`);
+			clearTimeout(this.debounceTimer);
+			clearTimeout(this.pollTimeout);
+		} catch (e) {
+			this.error(`Couuld not clear timeouts due to: ${e}`);
+		}
+	}
+
 }
 
 module.exports = GarageDoorDevice;

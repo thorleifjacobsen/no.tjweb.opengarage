@@ -13,5 +13,8 @@
   },
   "1.1.1": {
     "en": "Updated to use new garage door. Auto migration, some deprecrated functions and code cleanup"
+  },
+  "1.1.2": {
+    "en": "Lowered min poll rate, vehicle state card working, setting syncronised on change, bug with multiple announcements possible fixed."
   }
 }
