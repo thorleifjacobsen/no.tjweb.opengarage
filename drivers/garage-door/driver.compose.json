@@ -5,13 +5,6 @@
   },
   "class": "garagedoor",
   "capabilities": ["garagedoor_closed", "vehicle_state", "measure_distance", "measure_rssi"],
-  "capabilitiesOptions": {
-    "garagedoor_closed": {
-      "insights": true,
-      "insightsTitleTrue": { "en": "Closed" },
-      "insightsTitleFalse": { "en": "Open" }
-    }
-  },
   "pair": [
     {
       "id": "start"

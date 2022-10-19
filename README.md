@@ -25,7 +25,8 @@ When adding a OpenGarage device to your Homey you need to enter the IP address, 
  - Increment probing time if device is no longer available to save on network requests
  
 ## Changelog
-
+- 1.1.3 
+    - Added so the setting for close time actually is useful, if door state is not read changed within this time it will revert door open with an error.
 - 1.1.2
     - Lowered minimum poll rate, your choice if ur network is good enough.
     - Fixed: Bug where it would announce closed, open and closed.

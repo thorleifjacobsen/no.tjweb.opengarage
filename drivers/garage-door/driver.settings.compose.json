@@ -57,7 +57,7 @@
           "en": "Polling Rate"
         },
         "value": 5,
-        "min": 30,
+        "min": 5,
         "max": 86400,
         "hint": {
           "en": "Number of seconds between each time Homey should fetch data from the OpenGarage device."
