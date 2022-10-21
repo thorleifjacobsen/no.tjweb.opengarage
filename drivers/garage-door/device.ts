@@ -44,9 +44,9 @@ class GarageDoorDevice extends Homey.Device {
 
 		// Start polling
 		this.log(`Starting timer for device: ${this.getName()}`);
-		this.pollData();
+		this.pollData().catch((e) => {});
 
-		this.getDeviceSettings();
+		this.getDeviceSettings().catch((e) => {});
 
 	}
 
@@ -65,7 +65,7 @@ class GarageDoorDevice extends Homey.Device {
 						let doorTime = this.getDoorTime(command);
 
 						// Debug
-						this.log(`Waiting : ${doorTime} to poll`);
+						this.log(`Waiting ${doorTime} seconds to poll`);
 
 						// If zero just accept it is closed. Polltimer will fix it.
 						if (doorTime == 0) return resolve();
@@ -114,7 +114,7 @@ class GarageDoorDevice extends Homey.Device {
 				.finally(() => {
 					this.debounceActive = false;
 					// Restart the timer
-					this.pollTimeout = setTimeout(() => { this.pollData() }, this.getSetting('pollingRate') * 1000);
+					this.pollTimeout = setTimeout(() => { this.pollData().catch((e) => {}) }, this.getSetting('pollingRate') * 1000);
 				});
 		})
 
@@ -142,7 +142,7 @@ class GarageDoorDevice extends Homey.Device {
 				})
 				.finally(() => {
 					if (!onlyOnce) {
-						this.pollTimeout = setTimeout(() => { this.pollData() }, this.getSetting('pollingRate') * 1000);
+						this.pollTimeout = setTimeout(() => { this.pollData().catch((e) => {}) }, this.getSetting('pollingRate') * 1000);
 					}
 				})
 		})
@@ -191,11 +191,17 @@ class GarageDoorDevice extends Homey.Device {
 					for (let [key, value] of Object.entries(data)) {
 						if (currentSettings[key] && currentSettings[key] != value) {
 							if (key == "aoo") value = value == 1 ? false : true;
-							currentSettings[key] = value;
+							if(typeof value == typeof currentSettings[key]) currentSettings[key] = value;
+							else {
+								this.error(`Typeof value (${typeof value}) does not match typeof setting (${typeof currentSettings[key]})`);
+							}
 						}
 					}
 					this.setSettings(currentSettings)
-						.then(() => { resolve(true); });
+						.then(() => { resolve(true); })
+						.catch((err) => {
+							this.error(`Error setting settings due to ${err}, keys trying to set: ${Object.keys(currentSettings).join(',')}`)
+						});
 				})
 				.catch((error) => {
 					this.error(`Error getting OG device config for ${this.getName()}. Error given: ${error.code} (${error.errno})`);
@@ -234,10 +240,8 @@ class GarageDoorDevice extends Homey.Device {
 			})
 
 			this.setDeviceSettings(urlParams.slice(0, -1))
-				.catch(err => {
-					Promise.reject("Unkonwn errror");
-				})
-				.finally(() => this.getDeviceSettings());
+				.catch(err => Promise.reject("Unkonwn errror"))
+				.finally(() => this.getDeviceSettings().catch((e) => {}));
 		}
 
 		Promise.resolve("Settings saved");
